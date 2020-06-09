@@ -19,7 +19,7 @@ const user = {
 
 let token = ''
 
-let keys:TeamKeys = { cryptPk: '', cryptSk: '', signPk: '', signSk: '' }
+let keys: TeamKeys = { cryptPk: '', cryptSk: '', signPk: '', signSk: '' }
 
 describe('Teams endpoints', () => {
   beforeAll(async () => {

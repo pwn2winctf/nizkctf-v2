@@ -2,7 +2,7 @@ import request from 'supertest'
 import app from '../../src/app'
 import { prepareDatabase, DatabaseStructure } from '../../utils'
 
-const store:DatabaseStructure = {
+const store: DatabaseStructure = {
   teams: {},
   users: {},
   solves: {},
@@ -23,7 +23,9 @@ describe('Users endpoints', () => {
       displayName: 'User tester',
       password: '123456'
     }
-    const { body, status } = await request(app({ database })).post('/users').send(data)
+    const { body, status } = await request(app({ database }))
+      .post('/users')
+      .send(data)
 
     const uuid: string = body.uuid
     const email: string = body.email
@@ -45,9 +47,11 @@ describe('Users endpoints', () => {
       password: '123456'
     }
 
-    const { body, status } = await request(app({ database })).post('/users').send(data)
+    const { body, status } = await request(app({ database }))
+      .post('/users')
+      .send(data)
 
-    const firstError:string = body.errors[0].param
+    const firstError: string = body.errors[0].param
 
     expect(firstError).toEqual('email')
     expect(status).toBe(422)
@@ -64,11 +68,13 @@ describe('Users endpoints', () => {
 
     await database.users.register(data)
 
-    const { body, status } = await request(app({ database })).post('/users/login').send(data)
+    const { body, status } = await request(app({ database }))
+      .post('/users/login')
+      .send(data)
 
-    const user: { uuid: string, email: string, displayName: string } = body.user
-    const token:string = body.token
-    const refreshToken:string = body.refreshToken
+    const user: { uuid: string; email: string; displayName: string } = body.user
+    const token: string = body.token
+    const refreshToken: string = body.refreshToken
     const { uuid, email, displayName } = user
 
     expect(uuid.length).toBeGreaterThan(0)
