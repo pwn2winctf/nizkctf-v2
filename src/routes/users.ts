@@ -49,7 +49,10 @@ export default function users (database: Database): Router {
         const data = await database.users.login({ email, password })
         res.status(200).send(data)
       } catch (err) {
-        res.status(400).json({ errors: [err] })
+        console.error(err)
+        res
+          .status(400)
+          .json({ errors: [{ code: 'semantic', message: err.message }] })
       }
     }
   )
