@@ -1,14 +1,7 @@
-import { Database, Team, Challenge, Solve } from './app'
-import admin, { credential } from 'firebase-admin'
+import { Database, Challenge, Solve } from './app'
+import admin from 'firebase-admin'
 import firebase from 'firebase'
-
-const config = {
-  apiKey: '',
-  authDomain: '',
-  databaseURL: '',
-  projectId: '',
-  storageBucket: ''
-}
+import { firebaseConfig } from '../constants.json'
 
 const firebaseAdminInstance = admin.initializeApp({
   credential: admin.credential.applicationDefault(),
@@ -17,7 +10,7 @@ const firebaseAdminInstance = admin.initializeApp({
 const authAdmin = firebaseAdminInstance.auth()
 const firestore = firebaseAdminInstance.firestore()
 
-const firebaseInstance = firebase.initializeApp(config)
+const firebaseInstance = firebase.initializeApp(firebaseConfig)
 const auth = firebaseInstance.auth()
 
 const prepareDatabase = (
