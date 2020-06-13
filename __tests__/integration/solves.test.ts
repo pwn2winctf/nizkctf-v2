@@ -2,7 +2,6 @@ import request from 'supertest'
 
 import { prepareDatabase, DatabaseStructure, claimFlag } from '../../utils'
 import app from '../../src/app'
-import { createTeamKeys, TeamKeys } from '../../src/libsodium'
 
 const store: DatabaseStructure = {
   teams: {},
@@ -28,23 +27,15 @@ const user = {
 
 let token = ''
 
-let keys: TeamKeys = { cryptPk: '', cryptSk: '', signPk: '', signSk: '' }
-
 const challengeId = 'test'
 
 let team = {
   id: '',
   name: 'Team test',
-  countries: ['br', 'us', 'jp', 'zw', 'pt'],
-  signPk: keys.signPk,
-  cryptPk: keys.cryptPk
+  countries: ['br', 'us', 'jp', 'zw', 'pt']
 }
 
 describe('Teams solves', () => {
-  beforeAll(async () => {
-    keys = await createTeamKeys()
-  })
-
   beforeEach(async () => {
     store.users = {}
     store.teams = {}
@@ -56,7 +47,7 @@ describe('Teams solves', () => {
     token = data.token
 
     team = await database.teams.register(team)
-    team = { ...team, ...keys }
+    team = { ...team }
   })
 
   it('Should submit flag', async () => {

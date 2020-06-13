@@ -18,14 +18,12 @@ const prepareDatabase = (
   auth: firebase.auth.Auth
 ): Database => ({
   teams: {
-    register: async ({ name, countries, signPk, cryptPk }) => {
+    register: async ({ name, countries }) => {
       const data = await firestore.collection('teams').add({
         name,
-        countries,
-        signPk,
-        cryptPk
+        countries
       })
-      return { id: data.id, name, countries, signPk, cryptPk }
+      return { id: data.id, name, countries }
     },
     get: async id => {
       const data = (

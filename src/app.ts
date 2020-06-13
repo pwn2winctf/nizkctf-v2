@@ -12,8 +12,6 @@ export interface Team {
   id: string
   name: string
   countries: string[]
-  cryptPk: string
-  signPk: string
 }
 
 export interface Solve {

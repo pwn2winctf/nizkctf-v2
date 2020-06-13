@@ -1,32 +1,5 @@
 import libsodium from 'libsodium-wrappers'
 
-export interface TeamKeys {
-  cryptPk: string
-  cryptSk: string
-  signPk: string
-  signSk: string
-}
-
-export async function createTeamKeys (): Promise<TeamKeys> {
-  await libsodium.ready
-
-  const {
-    publicKey: cryptPk,
-    privateKey: cryptSk
-  } = await libsodium.crypto_box_keypair()
-  const {
-    publicKey: signPk,
-    privateKey: signSk
-  } = await libsodium.crypto_sign_keypair()
-
-  return {
-    cryptPk: Buffer.from(cryptPk).toString('base64'),
-    cryptSk: Buffer.from(cryptSk).toString('base64'),
-    signPk: Buffer.from(signPk).toString('base64'),
-    signSk: Buffer.from(signSk).toString('base64')
-  }
-}
-
 export async function randomString (size: number): Promise<string> {
   await libsodium.ready
   return libsodium.randombytes_buf(size, 'hex').toLowerCase()
