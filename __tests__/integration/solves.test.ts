@@ -1,6 +1,6 @@
 import request from 'supertest'
 
-import { prepareDatabase, DatabaseStructure } from '../../utils'
+import { prepareDatabase, DatabaseStructure, claimFlag } from '../../utils'
 import app from '../../src/app'
 import { createTeamKeys, TeamKeys } from '../../src/libsodium'
 
@@ -40,10 +40,6 @@ let team = {
   cryptPk: keys.cryptPk
 }
 
-// I was unable to create the proof within the test
-const proof =
-  'dAjVdbYYCNjqSX7WZxnpssTFWxWzph9ASGGvf8pomjfqFNMapu7lJ6zRloPBiqBFiAjfgULFL8wYO3wjqb9xDjlmNmFhNGI3OGZjYjgxZGQ5MjBlNDUyYTE5ZGIyMmM4ZjcwMTFiZDRkNDg2YTg0MDI4MzFjOTJlNWE4N2ZkMzE='
-
 describe('Teams solves', () => {
   beforeAll(async () => {
     keys = await createTeamKeys()
@@ -66,6 +62,9 @@ describe('Teams solves', () => {
   it('Should submit flag', async () => {
     const database = prepareDatabase(store)
 
+    const challenge = await database.challenges.get(challengeId)
+    const proof = await claimFlag(team.name, 'CTF-BR{123}', challenge)
+
     const data = {
       proof,
       challengeId
@@ -76,8 +75,6 @@ describe('Teams solves', () => {
       .set({ Authorization: token })
       .set('content-type', 'application/json')
       .send(data)
-
-    console.log(response.body)
 
     expect(response.status).toBe(200)
   })
