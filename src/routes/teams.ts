@@ -29,14 +29,19 @@ export default function teams (database: Database): Router {
 
       const name: string = req.body.name
       const countries: string[] = req.body.countries
+      try {
+        const user = await database.users.current(req.headers.authorization!)
 
-      const user = await database.users.current(req.headers.authorization!)
+        const teamData = { name, countries, members: [user.uuid] }
 
-      const teamData = { name, countries, members: [user.uuid] }
+        const data = await database.teams.register(teamData)
 
-      await database.teams.register(teamData)
-
-      res.status(201).send(teamData)
+        return res.status(201).send(data)
+      } catch (err) {
+        res
+          .status(400)
+          .json({ errors: [{ code: 'semantic', message: err.message }] })
+      }
     }
   )
 
