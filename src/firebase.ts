@@ -1,4 +1,5 @@
 import { Database, Team, Challenge, Solve } from './app'
+import admin, { credential } from 'firebase-admin'
 import firebase from 'firebase'
 
 const config = {
@@ -9,16 +10,41 @@ const config = {
   storageBucket: ''
 }
 
+const firebaseAdminInstance = admin.initializeApp({
+  credential: admin.credential.applicationDefault(),
+  databaseURL: 'https://test-pwn2win.firebaseio.com'
+})
+const authAdmin = firebaseAdminInstance.auth()
+const firestore = firebaseAdminInstance.firestore()
+
 const firebaseInstance = firebase.initializeApp(config)
-const firestore = firebaseInstance.firestore()
 const auth = firebaseInstance.auth()
 
 const prepareDatabase = (
-  firestore: firebase.firestore.Firestore,
+  firestore: admin.firestore.Firestore,
+  authAdmin: admin.auth.Auth,
   auth: firebase.auth.Auth
 ): Database => ({
   teams: {
     register: async ({ name, countries, members }) => {
+      const currentTeam = (
+        await firestore
+          .collection('team_members')
+          .doc(members[0])
+          .get()
+      ).data()
+      console.log(currentTeam)
+      if (currentTeam) {
+        throw new Error('you are already part of a team')
+      }
+
+      await firestore
+        .collection('team_members')
+        .doc(members[0])
+        .set({
+          team: name
+        })
+
       const data = await firestore.collection('teams').add({
         name,
         countries,
@@ -32,14 +58,18 @@ const prepareDatabase = (
           .collection('teams')
           .doc(id)
           .get()
-      ).data
+      ).data()
 
       if (!data) {
         throw new Error('Not found')
       }
 
-      // TODO: implement
-      const team = {} as Team
+      const team = {
+        id,
+        name: data.name,
+        countries: data.countries,
+        members: data.members
+      }
       return team
     }
   },
@@ -49,19 +79,29 @@ const prepareDatabase = (
       return { id }
     },
     register: async ({ email, password, displayName }) => {
-      const data = await auth.createUserWithEmailAndPassword(email, password)
+      const userCredentials = await auth.createUserWithEmailAndPassword(
+        email,
+        password
+      )
 
-      if (data.user) {
-        await data.user.updateProfile({ displayName })
-        return { uuid: data.user.uid, email, displayName }
-      } else {
-        console.warn('Empty user:', data)
-        throw new Error('Empty user:' + data)
+      if (!userCredentials.user) {
+        throw new Error('Empty user')
       }
+
+      await userCredentials.user.updateProfile({ displayName })
+      await userCredentials.user.sendEmailVerification()
+
+      return { uuid: userCredentials.user.uid, email, displayName }
     },
     current: async token => {
-      // TODO implement
-      return { uuid: '', email: '', displayName: '' }
+      const tokenData = await authAdmin.verifyIdToken(token)
+
+      const user = await authAdmin.getUser(tokenData.uid)
+      return {
+        uuid: tokenData.uid,
+        email: user.email!,
+        displayName: user.displayName!
+      }
     },
     login: async ({ email, password }) => {
       const { user } = await auth.signInWithEmailAndPassword(email, password)
@@ -90,14 +130,20 @@ const prepareDatabase = (
           .collection('challenges')
           .doc(id)
           .get()
-      ).data
+      ).data()
 
       if (!data) {
         throw new Error('Not found')
       }
 
-      // TODO: implement
-      const challenge = {} as Challenge
+      const challenge = {
+        id,
+        memlimit: data.memlimit,
+        name: data.name,
+        opslimit: data.opslimit,
+        pk: data.pk,
+        salt: data.salt
+      } as Challenge
       return challenge
     }
   },
@@ -131,6 +177,6 @@ const prepareDatabase = (
   }
 })
 
-const database = prepareDatabase(firestore, auth)
+const database = prepareDatabase(firestore, authAdmin, auth)
 
 export default database
