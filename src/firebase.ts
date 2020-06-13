@@ -33,7 +33,7 @@ const prepareDatabase = (
           .doc(members[0])
           .get()
       ).data()
-      console.log(currentTeam)
+
       if (currentTeam) {
         throw new Error('you are already part of a team')
       }
