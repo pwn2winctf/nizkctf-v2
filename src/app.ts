@@ -77,7 +77,9 @@ export default function App (args: AppInterface): Server {
   const listener = app.listen(port, function () {
     const { port } = listener.address() as AddressInfo
 
-    console.log(`Listening on port ${port}!`)
+    if (process.env.NODE_ENV !== 'test') {
+      console.log(`Listening on port ${port}!`)
+    }
   })
 
   return listener
