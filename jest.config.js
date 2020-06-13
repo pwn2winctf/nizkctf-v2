@@ -1,5 +1,6 @@
 module.exports = {
   roots: ['<rootDir>'],
+  testEnvironment: 'jest-environment-uint8array',
   transform: {
     '^.+\\.tsx?$': 'ts-jest'
   },
