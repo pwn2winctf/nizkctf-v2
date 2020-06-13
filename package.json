@@ -9,10 +9,11 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts --ignore __tests__",
-    "tsc": "tsc",
-    "test": "jest",
-    "lint": "prettier-standard  \"*.+(ts|js|json|css|md)\" \"+(src|__tests__)/**/*.+(ts|js|json|css|md)\" --check",
-    "lint:fix": "prettier-standard \"*.+(ts|js|json|css|md)\" \"+(src|__tests__)/**/*.+(ts|js|json|css|md)\" --format --lint"
+    "build": "tsc",
+    "test": "jest"
+  },
+  "engines": {
+    "node": "12.x"
   },
   "lint-staged": {
     "*.+(ts|js|json|css|md|json)": [
@@ -23,11 +24,6 @@
       "prettier-standard --lint",
       "git add"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
@@ -62,9 +58,9 @@
     "jest-environment-uint8array": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
     "nodemon": "^2.0.4",
-    "prettier-standard": "^16.3.0",
     "supertest": "^4.0.2",
     "ts-jest": "^26.1.0",
+    "tslint": "^6.1.2",
     "typescript": "^3.9.3",
     "uuid": "^8.1.0"
   }
