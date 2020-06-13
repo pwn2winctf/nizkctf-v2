@@ -20,6 +20,7 @@ const store: DatabaseStructure = {
 }
 
 const user = {
+  uuid: '',
   email: 'lorhan@mailinator.com',
   displayName: 'Lorhan Sohaky',
   password: '123456'
@@ -42,11 +43,12 @@ describe('Teams solves', () => {
 
     const database = prepareDatabase(store)
 
-    await database.users.register(user)
+    const { uuid } = await database.users.register(user)
     const data = await database.users.login(user)
     token = data.token
+    user.uuid = uuid
 
-    team = await database.teams.register(team)
+    team = await database.teams.register({ ...team, members: [user.uuid] })
     team = { ...team }
   })
 

@@ -10,6 +10,7 @@ export interface DatabaseStructure {
     [key: string]: {
       name: string
       countries: string[]
+      members: string[]
     }
   }
   users: {
@@ -38,15 +39,15 @@ export interface DatabaseStructure {
 
 export function prepareDatabase (store: DatabaseStructure): Database {
   const teams: Database['teams'] = {
-    register: async ({ name, countries }) => {
+    register: async ({ name, countries, members }) => {
       const id = createHash('sha256')
         .update(name)
         .digest('hex')
       if (store.teams[id]) {
         throw Error('Already exists this team')
       }
-      store.teams[id] = { name, countries }
-      return { id, name, countries }
+      store.teams[id] = { name, countries, members }
+      return { id, name, countries, members }
     },
     get: async id => {
       const item = store.teams[id]
@@ -69,6 +70,13 @@ export function prepareDatabase (store: DatabaseStructure): Database {
       store.users[uuid] = { email, password, displayName }
 
       return { uuid, email, displayName }
+    },
+    current: async token => {
+      const userData = store.users[token]
+      if (!userData) {
+        throw Error('User not found')
+      }
+      return { uuid: token, ...userData }
     },
     login: async ({ email, password }) => {
       const userEntries = Object.entries(store.users).find(

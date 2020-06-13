@@ -18,12 +18,13 @@ const prepareDatabase = (
   auth: firebase.auth.Auth
 ): Database => ({
   teams: {
-    register: async ({ name, countries }) => {
+    register: async ({ name, countries, members }) => {
       const data = await firestore.collection('teams').add({
         name,
-        countries
+        countries,
+        members
       })
-      return { id: data.id, name, countries }
+      return { id: data.id, name, countries, members }
     },
     get: async id => {
       const data = (
@@ -57,6 +58,10 @@ const prepareDatabase = (
         console.warn('Empty user:', data)
         throw new Error('Empty user:' + data)
       }
+    },
+    current: async token => {
+      // TODO implement
+      return { uuid: '', email: '', displayName: '' }
     },
     login: async ({ email, password }) => {
       const { user } = await auth.signInWithEmailAndPassword(email, password)

@@ -30,7 +30,9 @@ export default function teams (database: Database): Router {
       const name: string = req.body.name
       const countries: string[] = req.body.countries
 
-      const teamData = { name, countries }
+      const user = await database.users.current(req.headers.authorization!)
+
+      const teamData = { name, countries, members: [user.uuid] }
 
       await database.teams.register(teamData)
 
@@ -52,14 +54,25 @@ export default function teams (database: Database): Router {
         return res.status(422).json({ errors: errors.array() })
       }
 
-      // const user = await database.users.current(req.headers.authorization)
-
-      const challengeId: string = req.body.challengeId
+      const token = req.headers.authorization!
       const teamId: string = req.params.teamId
+      const challengeId: string = req.body.challengeId
+      const proof = Buffer.from(req.body.proof, 'base64')
+
+      const user = await database.users.current(token)
+      const team = await database.teams.get(teamId)
       const solves = await database.solves.get(teamId)
 
+      if (!team.members.includes(user.uuid)) {
+        return res.status(403).json({
+          errors: [
+            { code: 'semantic', message: "you don't belong on this team" }
+          ]
+        })
+      }
+
       if (solves && solves[challengeId]) {
-        res.status(422).json({
+        return res.status(422).json({
           errors: {
             code: 'semantic',
             message: 'Your team already solved this challenge'
@@ -67,9 +80,7 @@ export default function teams (database: Database): Router {
         })
       }
 
-      const proof = Buffer.from(req.body.proof, 'base64')
       const challenge = await database.challenges.get(challengeId)
-      const team = await database.teams.get(teamId)
 
       const challengePk = Buffer.from(challenge.pk, 'base64')
       const sha = createHash('sha256')
@@ -80,14 +91,14 @@ export default function teams (database: Database): Router {
       ).toString('ascii')
 
       if (claimedTeamNameSha !== sha) {
-        res
+        return res
           .status(422)
           .json({ errors: { code: 'semantic', message: 'Invalid proof' } })
       }
 
       const data = await database.solves.register(teamId, challengeId)
 
-      res.status(200).send(data)
+      return res.status(200).send(data)
     }
   )
 

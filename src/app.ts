@@ -12,6 +12,7 @@ export interface Team {
   id: string
   name: string
   countries: string[]
+  members: string[]
 }
 
 export interface Solve {
@@ -43,6 +44,9 @@ export interface Database {
       displayName: string
     }) => Promise<{ uuid: string; email: string; displayName: string }>
     get: (id: string) => Promise<{ id: string }>
+    current: (
+      token: string
+    ) => Promise<{ uuid: string; email: string; displayName: string }>
     login: ({
       email,
       password
