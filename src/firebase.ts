@@ -4,7 +4,7 @@ import firebase from 'firebase'
 import { firebaseConfig } from '../constants.json'
 
 const firebaseAdminInstance = admin.initializeApp({
-  credential: admin.credential.applicationDefault(),
+  credential: admin.credential.cert(JSON.parse(process.env.CREDS!)),
   databaseURL: 'https://test-pwn2win.firebaseio.com'
 })
 const authAdmin = firebaseAdminInstance.auth()
