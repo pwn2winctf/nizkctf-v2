@@ -2,7 +2,7 @@
   "firebaseConfig": {
     "apiKey": "AIzaSyCv7sMvo1i0cwjhJ3aE3gGD8uB6a4GTiy0",
     "authDomain": "test-pwn2win.firebaseapp.com",
-    "databaseURL": "https: //test-pwn2win.firebaseio.com",
+    "databaseURL": "https://test-pwn2win.firebaseio.com",
     "projectId": "test-pwn2win",
     "storageBucket": "test-pwn2win.appspot.com"
   },
