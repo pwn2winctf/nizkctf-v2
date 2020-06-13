@@ -3,7 +3,7 @@ curl -X POST -H "Content-Type: application/json" http://localhost:8080/users -d 
 ```
 
 ```sh
-curl -X POST -H "Content-Type: application/json" http://localhost:8080/users/login -d '{"email":"<email>@mailinator.com", "password":"<password>", "displayName":"<name>"}'
+curl -X POST -H "Content-Type: application/json" http://localhost:8080/users/login -d '{"email":"<email>@mailinator.com", "password":"<password>"}'
 ```
 
 ```sh
