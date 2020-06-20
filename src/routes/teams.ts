@@ -49,8 +49,7 @@ export default function teams (database: Database): Router {
     '/:teamId/solves',
     [
       check('challengeId')
-        .isString()
-        .custom((teamId: string) => teamId.length > 0),
+        .isString(),
       check('proof').isBase64()
     ],
     async (req: Request, res: Response) => {
@@ -97,7 +96,7 @@ export default function teams (database: Database): Router {
         ).toString('ascii')
 
         if (claimedTeamNameSha !== sha) {
-          throw new TypeError('Invalid proof')
+          throw new TypeError()
         }
 
         const data = await database.solves.register(teamId, challengeId)
@@ -108,6 +107,10 @@ export default function teams (database: Database): Router {
           return res
             .status(400)
             .json({ errors: [{ code: 'semantic', message: 'Invalid proof' }] })
+        } else if (err instanceof Error) {
+          return res
+            .status(400)
+            .json({ errors: [{ code: 'semantic', message: err.message }] })
         }
       }
     }
