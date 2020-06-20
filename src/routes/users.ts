@@ -27,9 +27,9 @@ export default function users (database: Database): Router {
           password,
           displayName
         })
-        res.status(201).send(data)
+        return res.status(201).send(data)
       } catch (err) {
-        res.status(400).json({ errors: [err] })
+        return res.status(400).json({ errors: [{ code: 'semantic', message: err.message }] })
       }
     }
   )
@@ -47,10 +47,9 @@ export default function users (database: Database): Router {
 
       try {
         const data = await database.users.login({ email, password })
-        res.status(200).send(data)
+        return res.status(200).send(data)
       } catch (err) {
-        console.error(err)
-        res
+        return res
           .status(400)
           .json({ errors: [{ code: 'semantic', message: err.message }] })
       }
