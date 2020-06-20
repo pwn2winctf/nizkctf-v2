@@ -1,6 +1,6 @@
 import request from 'supertest'
 
-import { prepareDatabase, DatabaseStructure, claimFlag } from '../../utils'
+import { prepareDatabase, DatabaseStructure, claimFlag, APIError } from '../../utils'
 import app from '../../src/app'
 
 const store: DatabaseStructure = {
@@ -64,12 +64,61 @@ describe('Teams solves', () => {
       challengeId
     }
 
-    const response = await request(app({ database }))
+    const { status } = await request(app({ database }))
       .post(`/teams/${team.id}/solves`)
       .set({ Authorization: token })
       .set('content-type', 'application/json')
       .send(data)
 
-    expect(response.status).toBe(200)
+    expect(status).toBe(200)
+  })
+
+  it('Should not accept submission to already solved challenge ', async () => {
+    const database = prepareDatabase(store)
+
+    const challenge = await database.challenges.get(challengeId)
+    const proof = await claimFlag(team.name, 'CTF-BR{123}', challenge)
+
+    const data = {
+      proof,
+      challengeId
+    }
+
+    database.solves.register(team.id, challengeId)
+
+    const { status, body } = await request(app({ database }))
+      .post(`/teams/${team.id}/solves`)
+      .set({ Authorization: token })
+      .set('content-type', 'application/json')
+      .send(data)
+
+    const firstError: APIError = body.errors[0]
+
+    expect(status).toBe(422)
+    expect(firstError.code).toBe('semantic')
+    expect(firstError.message).toBe('Your team already solved this challenge')
+  })
+
+  it('Should not accept invalid proof', async () => {
+    const database = prepareDatabase(store)
+
+    const proof = Buffer.from('123', 'ascii').toString('base64')
+
+    const data = {
+      proof,
+      challengeId
+    }
+
+    const { status, body } = await request(app({ database }))
+      .post(`/teams/${team.id}/solves`)
+      .set({ Authorization: token })
+      .set('content-type', 'application/json')
+      .send(data)
+
+    const firstError: APIError = body.errors[0]
+
+    expect(status).toBe(400)
+    expect(firstError.code).toBe('semantic')
+    expect(firstError.message).toBe('Invalid proof')
   })
 })
