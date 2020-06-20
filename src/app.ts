@@ -1,7 +1,5 @@
-import express from 'express'
+import express, { Express } from 'express'
 import routes from './routes'
-import { Server } from 'http'
-import { AddressInfo } from 'net'
 
 export interface AppInterface {
   port?: number
@@ -68,7 +66,7 @@ export interface Database {
   }
 }
 
-export default function App (args: AppInterface): Server {
+export default function App (args: AppInterface): Express {
   const { port, database } = args
 
   const app = express()
@@ -76,13 +74,7 @@ export default function App (args: AppInterface): Server {
 
   app.use('/', routes(database))
 
-  const listener = app.listen(port, function () {
-    const { port } = listener.address() as AddressInfo
+  app.listen(port, () => null)
 
-    if (process.env.NODE_ENV !== 'test') {
-      console.log(`Listening on port ${port}!`)
-    }
-  })
-
-  return listener
+  return app
 }
