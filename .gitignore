@@ -92,3 +92,6 @@ typings/
 dist/
 
 serviceAccountKey.json
+# stryker temp files
+.stryker-tmp
+reports/
