@@ -1,6 +1,6 @@
 import request from 'supertest'
 
-import { prepareDatabase, DatabaseStructure } from '../../utils'
+import { prepareDatabase, DatabaseStructure, APIError } from '../../utils'
 import app from '../../src/app'
 
 const store: DatabaseStructure = {
@@ -58,6 +58,23 @@ describe('Teams endpoints', () => {
       .send(data)
 
     expect(response.status).toBe(201)
+  })
+
+  it('Should not create team without token', async () => {
+    const database = prepareDatabase(store)
+
+    const data = {
+      name: 'Team test',
+      countries: ['br', 'us', 'jp', 'zw', 'pt']
+    }
+    const response = await request(app({ database }))
+      .post('/teams')
+      .send(data)
+
+    const firstError: APIError = response.body.errors[0]
+    expect(response.status).toBe(403)
+    expect(firstError.code).toBe('Authorization')
+    expect(firstError.message).toBe('No credentials sent!')
   })
 
   it('Should not create team without name', async () => {
