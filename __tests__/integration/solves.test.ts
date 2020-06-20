@@ -40,6 +40,7 @@ describe('Teams solves', () => {
   beforeEach(async () => {
     store.users = {}
     store.teams = {}
+    store.solves = {}
 
     const database = prepareDatabase(store)
 
