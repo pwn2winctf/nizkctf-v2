@@ -5,6 +5,13 @@ import libsodium from 'libsodium-wrappers'
 import { Database, Challenge } from './src/app'
 import { cryptoSignSeedKeypair, cryptoSign } from './src/libsodium'
 
+export type APIError = {
+  code: string
+  message: string
+  location?: string
+  param?: string
+}
+
 export interface DatabaseStructure {
   teams: {
     [key: string]: {
