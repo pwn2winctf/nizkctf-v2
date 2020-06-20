@@ -78,10 +78,10 @@ export default function teams (database: Database): Router {
 
       if (solves && solves[challengeId]) {
         return res.status(422).json({
-          errors: {
+          errors: [{
             code: 'semantic',
             message: 'Your team already solved this challenge'
-          }
+          }]
         })
       }
 
@@ -91,19 +91,25 @@ export default function teams (database: Database): Router {
       const sha = createHash('sha256')
         .update(team.name)
         .digest('hex')
-      const claimedTeamNameSha = Buffer.from(
-        await cryptoSignOpen(proof, challengePk)
-      ).toString('ascii')
+      try {
+        const claimedTeamNameSha = Buffer.from(
+          await cryptoSignOpen(proof, challengePk)
+        ).toString('ascii')
 
-      if (claimedTeamNameSha !== sha) {
-        return res
-          .status(422)
-          .json({ errors: { code: 'semantic', message: 'Invalid proof' } })
+        if (claimedTeamNameSha !== sha) {
+          throw new TypeError('Invalid proof')
+        }
+
+        const data = await database.solves.register(teamId, challengeId)
+
+        return res.status(200).send(data)
+      } catch (err) {
+        if (err instanceof TypeError) {
+          return res
+            .status(400)
+            .json({ errors: [{ code: 'semantic', message: 'Invalid proof' }] })
+        }
       }
-
-      const data = await database.solves.register(teamId, challengeId)
-
-      return res.status(200).send(data)
     }
   )
 
