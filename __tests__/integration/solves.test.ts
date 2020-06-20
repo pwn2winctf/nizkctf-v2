@@ -3,8 +3,10 @@ import request from 'supertest'
 import { prepareDatabase, DatabaseStructure, claimFlag, APIError } from '../../utils'
 import app from '../../src/app'
 
-const store: DatabaseStructure = {
-  teams: {},
+const initialState: DatabaseStructure = {
+  teams: {
+
+  },
   users: {},
   solves: {},
   challenges: {
@@ -18,6 +20,8 @@ const store: DatabaseStructure = {
     }
   }
 }
+
+const store: DatabaseStructure = Object.create(initialState)
 
 const user = {
   uuid: '',
@@ -36,11 +40,17 @@ let team = {
   countries: ['br', 'us', 'jp', 'zw', 'pt']
 }
 
+let team2 = {
+  id: '',
+  name: 'Team test2',
+  countries: ['br', 'us', 'jp', 'zw', 'pt']
+}
+
 describe('Teams solves', () => {
   beforeEach(async () => {
-    store.users = {}
-    store.teams = {}
-    store.solves = {}
+    store.users = { ...initialState.users }
+    store.teams = { ...initialState.teams }
+    store.solves = { ...initialState.solves }
 
     const database = prepareDatabase(store)
 
@@ -50,7 +60,9 @@ describe('Teams solves', () => {
     user.uuid = uuid
 
     team = await database.teams.register({ ...team, members: [user.uuid] })
+    team2 = await database.teams.register({ ...team2, members: ['random_uuid'] })
     team = { ...team }
+    team2 = { ...team2 }
   })
 
   it('Should submit flag', async () => {
@@ -71,6 +83,89 @@ describe('Teams solves', () => {
       .send(data)
 
     expect(status).toBe(200)
+  })
+
+  it('Should not accept submission without challengeId', async () => {
+    const database = prepareDatabase(store)
+
+    const challenge = await database.challenges.get(challengeId)
+    const proof = await claimFlag(team.name, 'CTF-BR{123}', challenge)
+
+    const data = { proof }
+
+    const { status, body } = await request(app({ database }))
+      .post(`/teams/${team.id}/solves`)
+      .set({ Authorization: token })
+      .set('content-type', 'application/json')
+      .send(data)
+
+    const firstError: APIError = body.errors[0]
+    expect(status).toBe(422)
+    expect(firstError.param).toBe('challengeId')
+  })
+
+  it('Should not accept submission without proof', async () => {
+    const database = prepareDatabase(store)
+
+    const data = { challengeId }
+
+    const { status, body } = await request(app({ database }))
+      .post(`/teams/${team.id}/solves`)
+      .set({ Authorization: token })
+      .set('content-type', 'application/json')
+      .send(data)
+
+    const firstError: APIError = body.errors[0]
+    expect(status).toBe(422)
+    expect(firstError.param).toBe('proof')
+  })
+
+  it('Should not accept submission to another team', async () => {
+    const database = prepareDatabase(store)
+
+    const challenge = await database.challenges.get(challengeId)
+    const proof = await claimFlag(team.name, 'CTF-BR{123}', challenge)
+
+    const data = {
+      proof,
+      challengeId
+    }
+
+    const { status, body } = await request(app({ database }))
+      .post(`/teams/${team2.id}/solves`)
+      .set({ Authorization: token })
+      .set('content-type', 'application/json')
+      .send(data)
+
+    const firstError: APIError = body.errors[0]
+
+    expect(status).toBe(403)
+    expect(firstError.code).toBe('semantic')
+    expect(firstError.message).toBe('you don\'t belong on this team')
+  })
+
+  it('Should not accept flag from another team', async () => {
+    const database = prepareDatabase(store)
+
+    const challenge = await database.challenges.get(challengeId)
+    const proof = await claimFlag(team2.name, 'CTF-BR{123}', challenge)
+
+    const data = {
+      proof,
+      challengeId
+    }
+
+    const { status, body } = await request(app({ database }))
+      .post(`/teams/${team.id}/solves`)
+      .set({ Authorization: token })
+      .set('content-type', 'application/json')
+      .send(data)
+
+    const firstError: APIError = body.errors[0]
+
+    expect(status).toBe(400)
+    expect(firstError.code).toBe('semantic')
+    expect(firstError.message).toBe('Invalid proof')
   })
 
   it('Should not accept submission to already solved challenge ', async () => {
@@ -118,6 +213,7 @@ describe('Teams solves', () => {
     const firstError: APIError = body.errors[0]
 
     expect(status).toBe(400)
+    expect(firstError).not.toEqual(undefined)
     expect(firstError.code).toBe('semantic')
     expect(firstError.message).toBe('Invalid proof')
   })
