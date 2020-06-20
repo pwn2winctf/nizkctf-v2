@@ -11,6 +11,7 @@ const store: DatabaseStructure = {
 }
 
 const user = {
+  uuid: '',
   email: 'lorhan@mailinator.com',
   displayName: 'Lorhan Sohaky',
   password: '123456'
@@ -27,6 +28,7 @@ describe('Teams endpoints', () => {
 
     await database.users.register(user)
     const data = await database.users.login(user)
+    user.uuid = data.user.uuid
     token = data.token
   })
 
@@ -58,6 +60,28 @@ describe('Teams endpoints', () => {
       .send(data)
 
     expect(response.status).toBe(201)
+  })
+
+  it('Should not create already exists team', async () => {
+    const database = prepareDatabase(store)
+
+    const data = {
+      name: 'Team test',
+      countries: ['br', 'us', 'jp', 'zw', 'pt']
+    }
+    database.teams.register({ ...data, members: [user.uuid] })
+
+    const { body, status } = await request(app({ database }))
+      .post('/teams')
+      .set({ Authorization: token })
+      .send(data)
+
+    const firstError: APIError = body.errors[0]
+
+    expect(status).toBe(400)
+    expect(firstError).not.toEqual(undefined)
+    expect(firstError.code).toBe('semantic')
+    expect(firstError.message).toBe('Already exists this team')
   })
 
   it('Should not create team without token', async () => {
