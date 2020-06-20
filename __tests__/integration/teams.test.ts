@@ -85,11 +85,15 @@ describe('Teams endpoints', () => {
       countries: []
     }
 
-    const response = await request(app({ database }))
+    const { body, status } = await request(app({ database }))
       .post('/teams')
       .set({ Authorization: token })
       .send(data)
-    expect(response.status).toBe(422)
+
+    const firstError: APIError = body.errors[0]
+
+    expect(status).toBe(422)
+    expect(firstError.param).toBe('name')
   })
 
   it('Should not create team without valid countries flag', async () => {
@@ -100,26 +104,33 @@ describe('Teams endpoints', () => {
       countries: ['usa']
     }
 
-    const response = await request(app({ database }))
+    const { body, status } = await request(app({ database }))
       .post('/teams')
       .set({ Authorization: token })
       .send(data)
-    expect(response.status).toBe(422)
+
+    const firstError: APIError = body.errors[0]
+
+    expect(status).toBe(422)
+    expect(firstError.param).toBe('name')
   })
 
   it('Should not create team with more countries flag than allowed', async () => {
     const database = prepareDatabase(store)
 
     const data = {
-      name: '',
+      name: 'Testing',
       countries: ['br', 'us', 'jp', 'zw', 'pt', 'ru']
     }
 
-    const response = await request(app({ database }))
+    const { body, status } = await request(app({ database }))
       .post('/teams')
       .set({ Authorization: token })
       .send(data)
 
-    expect(response.status).toBe(422)
+    const firstError: APIError = body.errors[0]
+
+    expect(status).toBe(422)
+    expect(firstError.param).toBe('countries')
   })
 })
