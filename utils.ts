@@ -47,6 +47,9 @@ export interface DatabaseStructure {
 export function prepareDatabase (store: DatabaseStructure): Database {
   const teams: Database['teams'] = {
     register: async ({ name, countries, members }) => {
+      if (members.length !== 1 || typeof members[0] !== 'string') {
+        throw Error('Members required')
+      }
       const id = createHash('sha256')
         .update(name)
         .digest('hex')
