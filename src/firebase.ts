@@ -2,9 +2,12 @@ import { Database, Challenge, Solve } from './app'
 import admin from 'firebase-admin'
 import firebase from 'firebase'
 import { firebaseConfig } from '../constants.json'
+import { SemanticError, NotFoundError, AuthorizationError } from './types/errors'
+
+const credential = process.env.CREDS ? JSON.parse(process.env.CREDS) : require('../serviceAccountKey.json')
 
 const firebaseAdminInstance = admin.initializeApp({
-  credential: admin.credential.cert(JSON.parse(process.env.CREDS!)),
+  credential: admin.credential.cert(credential),
   databaseURL: 'https://test-pwn2win.firebaseio.com'
 })
 const authAdmin = firebaseAdminInstance.auth()
@@ -28,7 +31,7 @@ const prepareDatabase = (
       ).data()
 
       if (currentTeam) {
-        throw new Error('you are already part of a team')
+        throw new SemanticError('you are already part of a team')
       }
 
       await firestore
@@ -54,7 +57,7 @@ const prepareDatabase = (
       ).data()
 
       if (!data) {
-        throw new Error('Not found')
+        throw new NotFoundError('Not found')
       }
 
       const team = {
@@ -100,11 +103,11 @@ const prepareDatabase = (
       const { user } = await auth.signInWithEmailAndPassword(email, password)
 
       if (!user) {
-        throw new Error("Users don't exists")
+        throw new NotFoundError("Users don't exists")
       }
 
       if (!user.emailVerified) {
-        throw new Error('Email not verified')
+        throw new AuthorizationError('Email not verified')
       }
 
       const token = await user.getIdToken()
@@ -126,7 +129,7 @@ const prepareDatabase = (
       ).data()
 
       if (!data) {
-        throw new Error('Not found')
+        throw new NotFoundError('Not found')
       }
 
       const challenge = {
@@ -160,7 +163,7 @@ const prepareDatabase = (
       ).data
 
       if (!data) {
-        throw new Error('Not found')
+        throw new NotFoundError('Not found')
       }
 
       // TODO: implement

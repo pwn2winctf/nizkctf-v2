@@ -1,14 +1,14 @@
 import { Request, Response, NextFunction } from 'express'
+import { AuthorizationError } from './types/errors'
 
 export function authMiddleware (
   req: Request,
   res: Response,
   next: NextFunction
-): Response | undefined {
+): void {
   if (!req.headers.authorization) {
-    return res.status(403).json({
-      errors: [{ code: 'Authorization', message: 'No credentials sent!' }]
-    })
+    next(new AuthorizationError('No credentials sent!', 401))
+  } else {
+    next()
   }
-  next()
 }

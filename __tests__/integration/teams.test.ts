@@ -78,7 +78,7 @@ describe('Teams endpoints', () => {
 
     const firstError: APIError = body.errors[0]
 
-    expect(status).toBe(400)
+    expect(status).toBe(422)
     expect(firstError).not.toEqual(undefined)
     expect(firstError.code).toBe('semantic')
     expect(firstError.message).toBe('Already exists this team')
@@ -96,8 +96,8 @@ describe('Teams endpoints', () => {
       .send(data)
 
     const firstError: APIError = response.body.errors[0]
-    expect(response.status).toBe(403)
-    expect(firstError.code).toBe('Authorization')
+    expect(response.status).toBe(401)
+    expect(firstError.code).toBe('authorization')
     expect(firstError.message).toBe('No credentials sent!')
   })
 

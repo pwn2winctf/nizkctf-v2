@@ -1,5 +1,6 @@
 import express, { Express } from 'express'
 import routes from './routes'
+import errorHandler from './middlewares/errorHandler'
 
 export interface AppInterface {
   port?: number
@@ -76,5 +77,5 @@ export default function App (args: AppInterface): Express {
 
   app.listen(port, () => null)
 
-  return app
+  return errorHandler(app)
 }

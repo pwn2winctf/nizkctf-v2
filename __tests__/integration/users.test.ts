@@ -55,7 +55,7 @@ describe('Users endpoints', () => {
 
     const firstError: APIError = body.errors[0]
 
-    expect(status).toBe(400)
+    expect(status).toBe(422)
     expect(firstError.code).toEqual('semantic')
     expect(firstError.message).toEqual('Already exists a user with this email')
   })
@@ -165,8 +165,8 @@ describe('Users endpoints', () => {
 
     const firstError: APIError = body.errors[0]
 
-    expect(status).toBe(400)
-    expect(firstError.code).toBe('semantic')
+    expect(status).toBe(404)
+    expect(firstError.code).toBe('not-found')
     expect(firstError.message).toBe('Not exists a user with this email')
   })
 
@@ -187,7 +187,7 @@ describe('Users endpoints', () => {
 
     const firstError: APIError = body.errors[0]
 
-    expect(status).toBe(400)
+    expect(status).toBe(422)
     expect(firstError.code).toBe('semantic')
     expect(firstError.message).toBe('Wrong password')
   })

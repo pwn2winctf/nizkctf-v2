@@ -4,6 +4,7 @@ import libsodium from 'libsodium-wrappers'
 
 import { Database, Challenge } from './src/app'
 import { cryptoSignSeedKeypair, cryptoSign } from './src/libsodium'
+import { SemanticError, NotFoundError } from './src/types/errors'
 
 export type APIError = {
   code: string
@@ -48,13 +49,13 @@ export function prepareDatabase (store: DatabaseStructure): Database {
   const teams: Database['teams'] = {
     register: async ({ name, countries, members }) => {
       if (members.length !== 1 || typeof members[0] !== 'string') {
-        throw Error('Members required')
+        throw new Error('Members required')
       }
       const id = createHash('sha256')
         .update(name)
         .digest('hex')
       if (store.teams[id]) {
-        throw Error('Already exists this team')
+        throw new SemanticError('Already exists this team')
       }
       store.teams[id] = { name, countries, members }
       return { id, name, countries, members }
@@ -63,7 +64,7 @@ export function prepareDatabase (store: DatabaseStructure): Database {
       const item = store.teams[id]
 
       if (!item) {
-        throw Error('Not found')
+        throw new NotFoundError('Not found')
       }
 
       return { id, ...item }
@@ -73,7 +74,7 @@ export function prepareDatabase (store: DatabaseStructure): Database {
   const users: Database['users'] = {
     register: async ({ email, password, displayName }) => {
       if (Object.values(store.users).some(user => user.email === email)) {
-        throw Error('Already exists a user with this email')
+        throw new SemanticError('Already exists a user with this email')
       }
 
       const uuid = uuidv4()
@@ -84,7 +85,7 @@ export function prepareDatabase (store: DatabaseStructure): Database {
     current: async token => {
       const userData = store.users[token]
       if (!userData) {
-        throw Error('User not found')
+        throw new NotFoundError('User not found')
       }
       return { uuid: token, ...userData }
     },
@@ -93,11 +94,11 @@ export function prepareDatabase (store: DatabaseStructure): Database {
         item => item[1].email === email
       )
       if (!userEntries) {
-        throw Error('Not exists a user with this email')
+        throw new NotFoundError('Not exists a user with this email')
       }
 
       if (userEntries[1].password !== password) {
-        throw Error('Wrong password')
+        throw new SemanticError('Wrong password')
       }
 
       const uuid = userEntries[0]
@@ -116,12 +117,12 @@ export function prepareDatabase (store: DatabaseStructure): Database {
     register: async (teamId, challengeId) => {
       const team = store.teams[teamId]
       if (!team) {
-        throw new Error('Team not found')
+        throw new NotFoundError('Team not found')
       }
 
       const challenge = store.challenges[challengeId]
       if (!challenge) {
-        throw new Error('Challenge not found')
+        throw new NotFoundError('Challenge not found')
       }
 
       const previousData = store.solves[teamId] || {}
@@ -149,20 +150,6 @@ export function prepareDatabase (store: DatabaseStructure): Database {
     challenges
   }
 }
-
-/* async function cryptoPwhash (password:string, salt:Uint8Array, opslimit:number, memlimit:number):Promise<Uint8Array> {
-  await libsodium.ready
-  const hash = libsodium.crypto_pwhash(
-    libsodium.crypto_sign_SEEDBYTES,
-    password,
-    salt,
-    opslimit,
-    memlimit,
-    libsodium.crypto_pwhash_ALG_ARGON2ID13
-  )
-
-  return hash
-} */
 
 async function lookupFlag (flag: string, challenge: Challenge) {
   await libsodium.ready

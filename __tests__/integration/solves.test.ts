@@ -140,7 +140,7 @@ describe('Teams solves', () => {
     const firstError: APIError = body.errors[0]
 
     expect(status).toBe(403)
-    expect(firstError.code).toBe('semantic')
+    expect(firstError.code).toBe('authorization')
     expect(firstError.message).toBe('you don\'t belong on this team')
   })
 
@@ -163,7 +163,7 @@ describe('Teams solves', () => {
 
     const firstError: APIError = body.errors[0]
 
-    expect(status).toBe(400)
+    expect(status).toBe(422)
     expect(firstError.code).toBe('semantic')
     expect(firstError.message).toBe('Invalid proof')
   })
@@ -212,7 +212,7 @@ describe('Teams solves', () => {
 
     const firstError: APIError = body.errors[0]
 
-    expect(status).toBe(400)
+    expect(status).toBe(422)
     expect(firstError).not.toEqual(undefined)
     expect(firstError.code).toBe('semantic')
     expect(firstError.message).toBe('Invalid proof')
