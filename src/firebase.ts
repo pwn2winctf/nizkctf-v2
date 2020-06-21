@@ -1,6 +1,6 @@
 import { Database, Challenge, Solve } from './app'
 import admin from 'firebase-admin'
-import firebase from 'firebase'
+import firebase, { FirebaseError } from 'firebase'
 import { firebaseConfig } from '../constants.json'
 import { SemanticError, NotFoundError, AuthorizationError } from './types/errors'
 
@@ -15,6 +15,23 @@ const firestore = firebaseAdminInstance.firestore()
 
 const firebaseInstance = firebase.initializeApp(firebaseConfig)
 const auth = firebaseInstance.auth()
+
+const resolveFirebaseError = (err:FirebaseError) => {
+  switch (err.code) {
+    case 'auth/email-already-exists':
+    case 'auth/email-already-in-use':
+    case 'auth/invalid-argument':
+    case 'auth/invalid-display-name':
+    case 'auth/invalid-email':
+    case 'auth/invalid-password':
+      return SemanticError
+    case 'auth/user-not-found':
+    case 'auth/uid-already-exists':
+      return NotFoundError
+    default:
+      return Error
+  }
+}
 
 const prepareDatabase = (
   firestore: admin.firestore.Firestore,
@@ -75,100 +92,124 @@ const prepareDatabase = (
       return { id }
     },
     register: async ({ email, password, displayName }) => {
-      const userCredentials = await auth.createUserWithEmailAndPassword(
-        email,
-        password
-      )
+      try {
+        const userCredentials = await auth.createUserWithEmailAndPassword(
+          email,
+          password
+        )
 
-      if (!userCredentials.user) {
-        throw new Error('Empty user')
+        if (!userCredentials.user) {
+          throw new Error('Empty user')
+        }
+
+        await userCredentials.user.updateProfile({ displayName })
+        await userCredentials.user.sendEmailVerification()
+
+        return { uuid: userCredentials.user.uid, email, displayName }
+      } catch (err) {
+        throw new (resolveFirebaseError(err))(err.message)
       }
-
-      await userCredentials.user.updateProfile({ displayName })
-      await userCredentials.user.sendEmailVerification()
-
-      return { uuid: userCredentials.user.uid, email, displayName }
     },
     current: async token => {
-      const tokenData = await authAdmin.verifyIdToken(token)
+      try {
+        const tokenData = await authAdmin.verifyIdToken(token)
 
-      const user = await authAdmin.getUser(tokenData.uid)
-      return {
-        uuid: tokenData.uid,
-        email: user.email!,
-        displayName: user.displayName!
+        const user = await authAdmin.getUser(tokenData.uid)
+        return {
+          uuid: tokenData.uid,
+          email: user.email!,
+          displayName: user.displayName!
+        }
+      } catch (err) {
+        throw new (resolveFirebaseError(err))(err.message)
       }
     },
     login: async ({ email, password }) => {
-      const { user } = await auth.signInWithEmailAndPassword(email, password)
+      try {
+        const { user } = await auth.signInWithEmailAndPassword(email, password)
 
-      if (!user) {
-        throw new NotFoundError("Users don't exists")
-      }
+        if (!user) {
+          throw new NotFoundError("Users don't exists")
+        }
 
-      if (!user.emailVerified) {
-        throw new AuthorizationError('Email not verified')
-      }
+        if (!user.emailVerified) {
+          throw new AuthorizationError('Email not verified')
+        }
 
-      const token = await user.getIdToken()
-      const data = {
-        uuid: user.uid,
-        email: user.email || email,
-        displayName: user.displayName || ''
+        const token = await user.getIdToken()
+        const data = {
+          uuid: user.uid,
+          email: user.email || email,
+          displayName: user.displayName || ''
+        }
+        return { user: data, token, refreshToken: user.refreshToken }
+      } catch (err) {
+        throw new (resolveFirebaseError(err))(err.message)
       }
-      return { user: data, token, refreshToken: user.refreshToken }
     }
   },
   challenges: {
     get: async id => {
-      const data = (
-        await firestore
-          .collection('challenges')
-          .doc(id)
-          .get()
-      ).data()
+      try {
+        const data = (
+          await firestore
+            .collection('challenges')
+            .doc(id)
+            .get()
+        ).data()
 
-      if (!data) {
-        throw new NotFoundError('Not found')
+        if (!data) {
+          throw new NotFoundError('Not found')
+        }
+
+        const challenge = {
+          id,
+          memlimit: data.memlimit,
+          name: data.name,
+          opslimit: data.opslimit,
+          pk: data.pk,
+          salt: data.salt
+        } as Challenge
+        return challenge
+      } catch (err) {
+        throw new (resolveFirebaseError(err))(err.message)
       }
-
-      const challenge = {
-        id,
-        memlimit: data.memlimit,
-        name: data.name,
-        opslimit: data.opslimit,
-        pk: data.pk,
-        salt: data.salt
-      } as Challenge
-      return challenge
     }
   },
   solves: {
     register: async (teamId, challengeId) => {
-      const timestamp = new Date().getTime()
+      try {
+        const timestamp = new Date().getTime()
 
-      await firestore
-        .collection('solves')
-        .doc(teamId)
-        .set({ [challengeId]: timestamp })
-
-      return { [challengeId]: timestamp }
-    },
-    get: async id => {
-      const data = (
         await firestore
           .collection('solves')
-          .doc(id)
-          .get()
-      ).data
+          .doc(teamId)
+          .set({ [challengeId]: timestamp })
 
-      if (!data) {
-        throw new NotFoundError('Not found')
+        return { [challengeId]: timestamp }
+      } catch (err) {
+        throw new (resolveFirebaseError(err))(err.message)
       }
+    },
+    get: async id => {
+      try {
+        const data = (
+          await firestore
+            .collection('solves')
+            .doc(id)
+            .get()
+        ).data
 
-      // TODO: implement
-      const solves = {} as Solve
-      return solves
+        if (!data) {
+          throw new NotFoundError('Not found')
+        }
+
+        // TODO: implement
+        const solves = {} as Solve
+        return solves
+      } catch (err) {
+        throw new (resolveFirebaseError(err))(err.message)
+      }
     }
   }
 })
