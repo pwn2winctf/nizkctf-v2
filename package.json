@@ -59,6 +59,7 @@
     "nodemon": "^2.0.4",
     "supertest": "^4.0.2",
     "ts-jest": "^26.1.0",
+    "ts-node": "^8.10.2",
     "tslint": "^6.1.2",
     "typescript": "^3.9.3",
     "uuid": "^8.1.0"
