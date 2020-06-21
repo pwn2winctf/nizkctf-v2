@@ -145,7 +145,7 @@ const prepareDatabase = (
   },
   solves: {
     register: async (teamId, challengeId) => {
-      const timestamp = new Date().getMilliseconds()
+      const timestamp = new Date().getTime()
 
       await firestore
         .collection('solves')
