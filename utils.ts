@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { createHash } from 'crypto'
 import libsodium from 'libsodium-wrappers'
 
-import { Database, Challenge } from './src/app'
+import { Database, Challenge, Solves } from './src/app'
 import { cryptoSignSeedKeypair, cryptoSign } from './src/libsodium'
 import { SemanticError, NotFoundError } from './src/types/errors'
 
@@ -114,6 +114,16 @@ export function prepareDatabase (store: DatabaseStructure): Database {
   }
 
   const solves: Database['solves'] = {
+    all: async () => {
+      const solves = Object.entries(store.solves).reduce((obj:{[teamId:string]:Solves}, [teamId, challenges]) => {
+        console.log(teamId, teamId)
+        const teamSolves: Solves = { ...challenges }
+        obj[teamId] = teamSolves
+
+        return obj
+      }, {})
+      return solves
+    },
     register: async (teamId, challengeId) => {
       const team = store.teams[teamId]
       if (!team) {
@@ -138,6 +148,9 @@ export function prepareDatabase (store: DatabaseStructure): Database {
     }
   }
   const challenges: Database['challenges'] = {
+    all: async () => {
+      return store.challenges
+    },
     get: async id => {
       return store.challenges[id]
     }

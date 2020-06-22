@@ -14,7 +14,7 @@ export interface Team {
   members: string[]
 }
 
-export interface Solve {
+export interface Solves {
   [key: string]: number
 }
 
@@ -59,10 +59,12 @@ export interface Database {
     }>
   }
   solves: {
-    get: (teamId: string) => Promise<Solve>
-    register: (teamId: string, challengeId: string) => Promise<Solve>
+    all: () => Promise<{[teamId:string]:Solves}>
+    get: (teamId: string) => Promise<Solves>
+    register: (teamId: string, challengeId: string) => Promise<Solves>
   }
   challenges: {
+    all: () => Promise<{[challengeId:string]:Challenge}>
     get: (id: string) => Promise<Challenge>
   }
 }

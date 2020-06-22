@@ -1,4 +1,4 @@
-import { Database, Challenge, Solve } from './app'
+import { Database, Challenge, Solves } from './app'
 import admin from 'firebase-admin'
 import firebase, { FirebaseError } from 'firebase'
 import { firebaseConfig } from '../constants.json'
@@ -16,7 +16,7 @@ const firestore = firebaseAdminInstance.firestore()
 const firebaseInstance = firebase.initializeApp(firebaseConfig)
 const auth = firebaseInstance.auth()
 
-const resolveFirebaseError = (err:FirebaseError) => {
+const resolveFirebaseError = (err: FirebaseError) => {
   switch (err.code) {
     case 'auth/email-already-exists':
     case 'auth/email-already-in-use':
@@ -149,6 +149,19 @@ const prepareDatabase = (
     }
   },
   challenges: {
+    all: async () => {
+      const getChallenges = async () => (await firestore
+        .collection('challenges').get()).docs.reduce((obj: {[challengeId: string]: Challenge}, doc) => {
+        obj[doc.id] = doc.data() as Challenge
+        return obj
+      }, {})
+
+      try {
+        return await getChallenges()
+      } catch (err) {
+        throw new (resolveFirebaseError(err))(err.message)
+      }
+    },
     get: async id => {
       try {
         const data = (
@@ -177,6 +190,19 @@ const prepareDatabase = (
     }
   },
   solves: {
+    all: async () => {
+      const getSolves = async () => (await firestore
+        .collection('solves').get()).docs.reduce((obj:{[teamId:string]:Solves}, doc) => {
+        obj[doc.id] = doc.data()
+        return obj
+      }, {})
+
+      try {
+        return await getSolves()
+      } catch (err) {
+        throw new (resolveFirebaseError(err))(err.message)
+      }
+    },
     register: async (teamId, challengeId) => {
       try {
         const timestamp = new Date().getTime()
@@ -205,7 +231,7 @@ const prepareDatabase = (
         }
 
         // TODO: implement
-        const solves = {} as Solve
+        const solves = {} as Solves
         return solves
       } catch (err) {
         throw new (resolveFirebaseError(err))(err.message)
