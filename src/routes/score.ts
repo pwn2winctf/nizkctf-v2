@@ -26,6 +26,7 @@ interface Score{
 export default function score (database: Database): Router {
   const router = Router()
 
+  // TODO: add cache
   router.get(
     '/',
     async (req: Request, res: Response, next: NextFunction) => {
