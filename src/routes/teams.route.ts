@@ -5,7 +5,7 @@ import { createHash } from 'crypto'
 import { Database } from '../app'
 import * as constants from '../../constants.json'
 import { cryptoSignOpen } from '../libsodium'
-import { ValidationError, SemanticError, AuthorizationError } from '../types/errors'
+import { ValidationError, SemanticError, AuthorizationError } from '../types/errors.type'
 
 export default function teams (database: Database): Router {
   const router = Router()
@@ -90,7 +90,6 @@ export default function teams (database: Database): Router {
         }
 
         const data = await database.solves.register(teamId, challengeId)
-
         return res.status(200).send(data)
       } catch (err) {
         if (err instanceof TypeError && err.message.includes('is too short')) {

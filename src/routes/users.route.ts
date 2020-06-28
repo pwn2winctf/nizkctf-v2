@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express'
 import { Database } from '../app'
 import { check, validationResult } from 'express-validator'
-import { ValidationError } from '../types/errors'
+import { ValidationError } from '../types/errors.type'
 
 export default function users (database: Database): Router {
   const router = Router()

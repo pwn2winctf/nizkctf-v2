@@ -1,10 +1,12 @@
 import { Router } from 'express'
 
 import { Database } from '../app'
-import teamsRouter from './teams'
-import usersRouter from './users'
-import scoreRouter from './score'
-import { authMiddleware } from '../utils'
+
+import teamsRouter from './teams.route'
+import usersRouter from './users.route'
+import scoreRouter from './score.route'
+
+import authMiddleware from '../middlewares/auth.middleware'
 
 export default function (database: Database): Router {
   const router = Router()

@@ -4,7 +4,7 @@ import libsodium from 'libsodium-wrappers'
 
 import { Database, Challenge, Solves } from './src/app'
 import { cryptoSignSeedKeypair, cryptoSign } from './src/libsodium'
-import { SemanticError, NotFoundError } from './src/types/errors'
+import { SemanticError, NotFoundError } from './src/types/errors.type'
 
 export type APIError = {
   code: string
@@ -116,7 +116,6 @@ export function prepareDatabase (store: DatabaseStructure): Database {
   const solves: Database['solves'] = {
     all: async () => {
       const solves = Object.entries(store.solves).reduce((obj:{[teamId:string]:Solves}, [teamId, challenges]) => {
-        console.log(teamId, teamId)
         const teamSolves: Solves = { ...challenges }
         obj[teamId] = teamSolves
 

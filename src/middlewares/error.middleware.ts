@@ -1,5 +1,5 @@
 import { Express, Request, Response, NextFunction } from 'express'
-import { ValidationError, AuthorizationError, SemanticError, NotFoundError } from '../types/errors'
+import { ValidationError, AuthorizationError, SemanticError, NotFoundError } from '../types/errors.type'
 
 interface ArgsInterface {
  (err: Error, req: Request, res: Response<BodyOutput>, next: NextFunction): OutputErrors
@@ -62,7 +62,7 @@ const errorHandlerWrapper = (app:Express):Express => {
   app.use(semanticErrorHandler)
   app.use(notFoundErrorHandler)
 
-  app.use((err:Error, req:Request, res:Response, next:NextFunction) => {
+  app.use((err:Error, req:Request, res:Response) => {
     console.error(err)
     res
       .status(500)

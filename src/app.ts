@@ -1,6 +1,6 @@
 import express, { Express } from 'express'
 import routes from './routes'
-import errorHandler from './middlewares/errorHandler'
+import errorHandler from './middlewares/error.middleware'
 
 export interface AppInterface {
   port?: number
