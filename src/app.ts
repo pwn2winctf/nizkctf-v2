@@ -1,4 +1,6 @@
 import express, { Express } from 'express'
+import helmet from 'helmet'
+
 import routes from './routes'
 import errorHandler from './middlewares/error.middleware'
 
@@ -74,6 +76,7 @@ export default function App (args: AppInterface): Express {
 
   const app = express()
   app.use(express.json())
+  app.use(helmet())
 
   app.use('/', routes(database))
 
