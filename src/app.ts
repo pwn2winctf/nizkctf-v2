@@ -1,4 +1,5 @@
 import express, { Express } from 'express'
+import compression from 'compression'
 import helmet from 'helmet'
 
 import routes from './routes'
@@ -76,6 +77,7 @@ export default function App (args: AppInterface): Express {
 
   const app = express()
   app.use(express.json())
+  app.use(compression())
   app.use(helmet())
 
   app.use('/', routes(database))
