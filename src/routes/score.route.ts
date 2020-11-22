@@ -68,6 +68,10 @@ export default function score (database: Database): Router {
         const standings: Standing[] = temporaryStandings.map((item, index) => ({ ...item, pos: index }))
 
         const score:Score = { tasks, standings } as Score
+
+        res.set({
+          'Cache-Control':'public, max-age=0, s-age=1, stale-while-revalidate'
+        })
         return res.status(200).json(score)
       } catch (err) {
         next(err)
