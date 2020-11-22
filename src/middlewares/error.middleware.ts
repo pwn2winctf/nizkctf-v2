@@ -31,7 +31,7 @@ interface ValidationErrorItem extends ErrorItem {
   param: string
 }
 
-const validationErrorHandler: ArgsInterface = (err, req, res, next) => {
+const validationErrorHandler: ArgsInterface = (err, _, res, next) => {
   if (err instanceof ValidationError) {
     const errors: ValidationErrorItem[] = err.errors.map(
       (item): ValidationErrorItem => ({
@@ -47,7 +47,7 @@ const validationErrorHandler: ArgsInterface = (err, req, res, next) => {
   next(err)
 }
 
-const authorizationErrorHandler: ArgsInterface = (err, req, res, next) => {
+const authorizationErrorHandler: ArgsInterface = (err, _, res, next) => {
   if (err instanceof AuthorizationError) {
     const error: ErrorItem = { code: 'authorization', message: err.message }
     return res.status(err.statusCode).json({ errors: [error] })
@@ -56,7 +56,7 @@ const authorizationErrorHandler: ArgsInterface = (err, req, res, next) => {
   next(err)
 }
 
-const semanticErrorHandler: ArgsInterface = (err, req, res, next) => {
+const semanticErrorHandler: ArgsInterface = (err, _, res, next) => {
   if (err instanceof SemanticError) {
     return res
       .status(err.statusCode)
@@ -66,7 +66,7 @@ const semanticErrorHandler: ArgsInterface = (err, req, res, next) => {
   next(err)
 }
 
-const notFoundErrorHandler: ArgsInterface = (err, req, res, next) => {
+const notFoundErrorHandler: ArgsInterface = (err, _, res, next) => {
   if (err instanceof NotFoundError) {
     return res
       .status(err.statusCode)
@@ -82,7 +82,7 @@ const errorHandlerWrapper = (app: Express): Express => {
   app.use(semanticErrorHandler)
   app.use(notFoundErrorHandler)
 
-  app.use((err: Error, req: Request, res: Response) => {
+  app.use((err: Error, _: Request, res: Response) => {
     console.error(err)
     res.status(500).json({
       errors: [{ code: 'internal', message: 'Internal server error' }]

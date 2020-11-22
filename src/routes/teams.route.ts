@@ -3,30 +3,22 @@ import { check, validationResult } from 'express-validator'
 import { createHash } from 'crypto'
 
 import { Database } from '../app'
-import * as constants from '../../constants.json'
 import { cryptoSignOpen } from '../libsodium'
 import {
   ValidationError,
   SemanticError,
   AuthorizationError
 } from '../types/errors.type'
+import { newTeamScheme } from '../schemes/teams.scheme'
+import validate from '../middlewares/validation.middleware'
+import { authenticatedScheme } from '../schemes'
 
 export default function teams (database: Database): Router {
   const router = Router()
 
   router.post(
     '/',
-    [
-      check('name')
-        .isString()
-        .custom((name: string) => name.length > 0),
-      check('countries')
-        .isArray({ max: constants.maxCountriesFlag, min: 0 })
-        .custom((countries: string[]) =>
-          countries.every((item: string) => constants.countries.includes(item))
-        )
-    ],
-    async (req: Request, res: Response, next: NextFunction) => {
+    newTeamScheme, validate, async (req: Request, res: Response, next: NextFunction) => {
       try {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -46,7 +38,7 @@ export default function teams (database: Database): Router {
 
         const data = await database.teams.register(teamData)
 
-        return res.status(201).send(data)
+        res.status(201).send(data)
       } catch (err) {
         next(err)
       }
@@ -55,6 +47,7 @@ export default function teams (database: Database): Router {
 
   router.post(
     '/:teamId/solves',
+    authenticatedScheme, validate,
     [check('challengeId').isString(), check('proof').isBase64()],
     async (req: Request, res: Response, next: NextFunction) => {
       try {
@@ -99,7 +92,7 @@ export default function teams (database: Database): Router {
         }
 
         const data = await database.solves.register(teamId, challengeId)
-        return res.status(200).send(data)
+        res.status(200).send(data)
       } catch (err) {
         if (err instanceof TypeError && err.message.includes('is too short')) {
           next(new SemanticError('Invalid proof'))

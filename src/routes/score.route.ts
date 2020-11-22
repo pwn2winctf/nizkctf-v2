@@ -30,11 +30,11 @@ const responseCache = new NodeCache()
 export default function score (database: Database): Router {
   const router = Router()
 
-  // TODO: add cache
-  router.get('/', async (req: Request, res: Response, next: NextFunction) => {
+  router.get('/', async (_: Request, res: Response, next: NextFunction) => {
     try {
       if (responseCache.has('score')) {
-        return res.status(200).json(responseCache.get('score') as Score)
+        res.status(200).json(responseCache.get('score') as Score)
+        return
       }
       const challenges = await database.challenges.all()
       const solves = await database.solves.all()
@@ -98,7 +98,7 @@ export default function score (database: Database): Router {
 
       responseCache.set('score', score, 10)
 
-      return res.status(200).json(score)
+      res.status(200).json(score)
     } catch (err) {
       next(err)
     }

@@ -1,35 +1,26 @@
 import { Router, Request, Response, NextFunction } from 'express'
+
 import { Database } from '../app'
-import { check, validationResult } from 'express-validator'
-import { ValidationError } from '../types/errors.type'
+import { loginUserScheme, newUserScheme } from '../schemes/users.scheme'
+import validate from '../middlewares/validation.middleware'
 
 export default function users (database: Database): Router {
   const router = Router()
 
   router.post(
     '/',
-    [
-      check('email').isEmail(),
-      check('password').isString(),
-      check('displayName').isString()
-    ],
+    newUserScheme,
+    validate,
     async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
-          throw new ValidationError(errors)
-        }
-
-        const email: string = req.body.email
-        const password: string = req.body.password
-        const displayName: string = req.body.displayName
+        const { email, password, displayName } = req.body
 
         const data = await database.users.register({
           email,
           password,
           displayName
         })
-        return res.status(201).send(data)
+        res.status(201).send(data)
       } catch (err) {
         next(err)
       }
@@ -38,18 +29,13 @@ export default function users (database: Database): Router {
 
   router.post(
     '/login',
-    [check('email').isEmail(), check('password').isString()],
+    loginUserScheme, validate,
     async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
-          throw new ValidationError(errors)
-        }
-        const email: string = req.body.email
-        const password: string = req.body.password
+        const { email, password } = req.body
 
         const data = await database.users.login({ email, password })
-        return res.status(200).send(data)
+        res.status(200).send(data)
       } catch (err) {
         next(err)
       }
