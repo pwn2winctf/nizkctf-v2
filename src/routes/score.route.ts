@@ -3,6 +3,8 @@ import { Router, Request, Response, NextFunction } from 'express'
 import { Database } from '../app'
 import { computeScore } from '../utils'
 
+import  NodeCache from "node-cache"
+
 interface TaskStat{
   points:number
   time:number
@@ -23,6 +25,8 @@ interface Score{
   tasks:string[]
 }
 
+const responseCache = new NodeCache();
+
 export default function score (database: Database): Router {
   const router = Router()
 
@@ -31,6 +35,9 @@ export default function score (database: Database): Router {
     '/',
     async (req: Request, res: Response, next: NextFunction) => {
       try {
+        if(responseCache.has('score')){
+          return res.status(200).json(responseCache.get('score') as Score)
+        }
         const challenges = await database.challenges.all()
         const solves = await database.solves.all()
 
@@ -69,9 +76,7 @@ export default function score (database: Database): Router {
 
         const score:Score = { tasks, standings } as Score
 
-        res.set({
-          'Cache-Control':'public, max-age=0, s-age=5, stale-while-revalidate'
-        })
+        responseCache.set('score',score,10)
 
         return res.status(200).json(score)
       } catch (err) {
