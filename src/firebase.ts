@@ -1,10 +1,11 @@
 import { Database, Challenge, Solves } from './app'
-import admin from 'firebase-admin'
-import firebase, { FirebaseError } from 'firebase'
+import admin, {FirebaseError} from 'firebase-admin'
+import firebase from 'firebase'
 import { firebaseConfig } from '../constants.json'
 import { SemanticError, NotFoundError, AuthorizationError } from './types/errors.type'
 
 const credential = process.env.CREDS ? JSON.parse(process.env.CREDS) : require('../serviceAccountKey.json')
+
 
 const firebaseAdminInstance = admin.initializeApp({
   credential: admin.credential.cert(credential),
