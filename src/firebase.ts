@@ -32,31 +32,33 @@ const prepareDatabase = (
 ): Database => ({
   teams: {
     register: async ({ name, countries, members }) => {
-      const currentTeam = (
+      return await firestore.runTransaction(async () => {
+        const currentTeam = (
+          await firestore
+            .collection('team_members')
+            .doc(members[0])
+            .get()
+        ).data()
+
+        if (currentTeam) {
+          throw new SemanticError('you are already part of a team')
+        }
+
         await firestore
           .collection('team_members')
           .doc(members[0])
-          .get()
-      ).data()
+          .set({
+            team: name
+          })
 
-      if (currentTeam) {
-        throw new SemanticError('you are already part of a team')
-      }
-
-      await firestore
-        .collection('team_members')
-        .doc(members[0])
-        .set({
-          team: name
+        const data = await firestore.collection('teams').add({
+          name,
+          countries,
+          members
         })
 
-      const data = await firestore.collection('teams').add({
-        name,
-        countries,
-        members
+        return { id: data.id, name, countries, members }
       })
-
-      return { id: data.id, name, countries, members }
     },
     get: async id => {
       const data = (
