@@ -34,6 +34,7 @@
     }
   },
   "dependencies": {
+    "apicache": "^1.5.3",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv-flow": "^3.2.0",
@@ -43,13 +44,13 @@
     "firebase-admin": "^9.4.1",
     "helmet": "^3.22.0",
     "libsodium-wrappers": "^0.7.6",
-    "morgan": "^1.10.0",
-    "node-cache": "^5.1.2"
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "@stryker-mutator/core": "^3.2.4",
     "@stryker-mutator/jest-runner": "^3.2.4",
     "@stryker-mutator/typescript": "^3.2.4",
+    "@types/apicache": "^1.2.2",
     "@types/compression": "^1.7.0",
     "@types/cors": "^2.8.8",
     "@types/dotenv-flow": "^3.1.0",
