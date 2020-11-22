@@ -1,12 +1,15 @@
 import request from 'supertest'
 
-import { prepareDatabase, DatabaseStructure, claimFlag, APIError } from '../../utils'
+import {
+  prepareDatabase,
+  DatabaseStructure,
+  claimFlag,
+  APIError
+} from '../../utils'
 import app from '../../src/app'
 
 const initialState: DatabaseStructure = {
-  teams: {
-
-  },
+  teams: {},
   users: {},
   solves: {},
   challenges: {
@@ -60,7 +63,10 @@ describe('Teams solves', () => {
     user.uuid = uuid
 
     team = await database.teams.register({ ...team, members: [user.uuid] })
-    team2 = await database.teams.register({ ...team2, members: ['random_uuid'] })
+    team2 = await database.teams.register({
+      ...team2,
+      members: ['random_uuid']
+    })
     team = { ...team }
     team2 = { ...team2 }
   })
@@ -141,7 +147,7 @@ describe('Teams solves', () => {
 
     expect(status).toBe(403)
     expect(firstError.code).toBe('authorization')
-    expect(firstError.message).toBe('you don\'t belong on this team')
+    expect(firstError.message).toBe("you don't belong on this team")
   })
 
   it('Should not accept flag from another team', async () => {

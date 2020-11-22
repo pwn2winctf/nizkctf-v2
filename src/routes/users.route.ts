@@ -13,7 +13,7 @@ export default function users (database: Database): Router {
       check('password').isString(),
       check('displayName').isString()
     ],
-    async (req: Request, res: Response, next:NextFunction) => {
+    async (req: Request, res: Response, next: NextFunction) => {
       try {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -39,7 +39,7 @@ export default function users (database: Database): Router {
   router.post(
     '/login',
     [check('email').isEmail(), check('password').isString()],
-    async (req: Request, res: Response, next:NextFunction) => {
+    async (req: Request, res: Response, next: NextFunction) => {
       try {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {

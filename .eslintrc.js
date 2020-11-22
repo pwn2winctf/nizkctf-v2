@@ -3,7 +3,7 @@ module.exports = {
     browser: true,
     es6: true
   },
-  extends: ['standard', 'plugin:@typescript-eslint/recommended'],
+  extends: ['standard', 'plugin:@typescript-eslint/recommended', 'plugin:json/recommended'],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly'
@@ -13,6 +13,6 @@ module.exports = {
     ecmaVersion: 2020,
     sourceType: 'module'
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'markdown'],
   rules: {}
 }

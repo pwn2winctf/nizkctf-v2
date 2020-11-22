@@ -5,7 +5,11 @@ import { createHash } from 'crypto'
 import { Database } from '../app'
 import * as constants from '../../constants.json'
 import { cryptoSignOpen } from '../libsodium'
-import { ValidationError, SemanticError, AuthorizationError } from '../types/errors.type'
+import {
+  ValidationError,
+  SemanticError,
+  AuthorizationError
+} from '../types/errors.type'
 
 export default function teams (database: Database): Router {
   const router = Router()
@@ -22,16 +26,21 @@ export default function teams (database: Database): Router {
           countries.every((item: string) => constants.countries.includes(item))
         )
     ],
-    async (req: Request, res: Response, next:NextFunction) => {
+    async (req: Request, res: Response, next: NextFunction) => {
       try {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
           throw new ValidationError(errors)
         }
 
+        if (!req.headers.authorization) {
+          throw new Error('Authorization is required')
+        }
+
         const name: string = req.body.name
         const countries: string[] = req.body.countries
-        const user = await database.users.current(req.headers.authorization!)
+        const token:string = req.headers.authorization
+        const user = await database.users.current(token)
 
         const teamData = { name, countries, members: [user.uuid] }
 
@@ -46,19 +55,19 @@ export default function teams (database: Database): Router {
 
   router.post(
     '/:teamId/solves',
-    [
-      check('challengeId')
-        .isString(),
-      check('proof').isBase64()
-    ],
-    async (req: Request, res: Response, next:NextFunction) => {
+    [check('challengeId').isString(), check('proof').isBase64()],
+    async (req: Request, res: Response, next: NextFunction) => {
       try {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
           throw new ValidationError(errors)
         }
 
-        const token = req.headers.authorization!
+        if (!req.headers.authorization) {
+          throw new Error('Authorization is required')
+        }
+
+        const token = req.headers.authorization
         const teamId: string = req.params.teamId
         const challengeId: string = req.body.challengeId
         const proof = Buffer.from(req.body.proof, 'base64')
@@ -68,7 +77,7 @@ export default function teams (database: Database): Router {
         const solves = await database.solves.get(teamId)
 
         if (!team.members.includes(user.uuid)) {
-          throw new AuthorizationError('you don\'t belong on this team')
+          throw new AuthorizationError("you don't belong on this team")
         }
 
         if (solves && solves[challengeId]) {

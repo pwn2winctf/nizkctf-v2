@@ -115,12 +115,15 @@ export function prepareDatabase (store: DatabaseStructure): Database {
 
   const solves: Database['solves'] = {
     all: async () => {
-      const solves = Object.entries(store.solves).reduce((obj:{[teamId:string]:Solves}, [teamId, challenges]) => {
-        const teamSolves: Solves = { ...challenges }
-        obj[teamId] = teamSolves
+      const solves = Object.entries(store.solves).reduce(
+        (obj: { [teamId: string]: Solves }, [teamId, challenges]) => {
+          const teamSolves: Solves = { ...challenges }
+          obj[teamId] = teamSolves
 
-        return obj
-      }, {})
+          return obj
+        },
+        {}
+      )
       return solves
     },
     register: async (teamId, challengeId) => {

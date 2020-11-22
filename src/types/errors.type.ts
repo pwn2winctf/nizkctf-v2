@@ -1,8 +1,11 @@
-import { Result, ValidationError as ValidationErrorArgs } from 'express-validator'
+import {
+  Result,
+  ValidationError as ValidationErrorArgs
+} from 'express-validator'
 
 class HttpError extends Error {
-  public statusCode:number
-  constructor (statusCode:number, message:string) {
+  public statusCode: number
+  constructor (statusCode: number, message: string) {
     super(message)
     this.statusCode = statusCode
     Object.setPrototypeOf(this, ValidationError.prototype)
@@ -10,9 +13,9 @@ class HttpError extends Error {
 }
 
 export class ValidationError extends HttpError {
-  public errors:ValidationErrorArgs[]
+  public errors: ValidationErrorArgs[]
 
-  constructor (args:Result<ValidationErrorArgs>) {
+  constructor (args: Result<ValidationErrorArgs>) {
     super(422, 'Validation error')
     this.errors = args.array()
     Object.setPrototypeOf(this, ValidationError.prototype)
@@ -20,7 +23,7 @@ export class ValidationError extends HttpError {
 }
 
 export class AuthorizationError extends HttpError {
-  constructor (message:string, statusCode = 403) {
+  constructor (message: string, statusCode = 403) {
     super(statusCode, message)
 
     Object.setPrototypeOf(this, AuthorizationError.prototype)

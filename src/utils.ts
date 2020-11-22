@@ -1,6 +1,6 @@
 import { dynamic_scoring as dynamicScore } from '../constants.json'
 
-export function computeScore (numberOfSolves:number):number {
+export function computeScore (numberOfSolves: number): number {
   const { K, V, minpts, maxpts } = dynamicScore
 
   return Math.trunc(

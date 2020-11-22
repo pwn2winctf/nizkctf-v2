@@ -1,8 +1,12 @@
 import { Database, Challenge, Solves } from './app'
-import admin, {FirebaseError} from 'firebase-admin'
+import admin, { FirebaseError } from 'firebase-admin'
 import firebase from 'firebase'
 import { firebaseConfig } from '../constants.json'
-import { SemanticError, NotFoundError, AuthorizationError } from './types/errors.type'
+import {
+  SemanticError,
+  NotFoundError,
+  AuthorizationError
+} from './types/errors.type'
 
 const resolveFirebaseError = (err: FirebaseError) => {
   switch (err.code) {
@@ -103,10 +107,14 @@ const prepareDatabase = (
         const tokenData = await authAdmin.verifyIdToken(token)
 
         const user = await authAdmin.getUser(tokenData.uid)
+
+        if (!user.email || !user.displayName) {
+          throw new Error('Invalid user data')
+        }
         return {
           uuid: tokenData.uid,
-          email: user.email!,
-          displayName: user.displayName!
+          email: user.email,
+          displayName: user.displayName
         }
       } catch (err) {
         throw new (resolveFirebaseError(err))(err.message)
@@ -138,11 +146,14 @@ const prepareDatabase = (
   },
   challenges: {
     all: async () => {
-      const getChallenges = async () => (await firestore
-        .collection('challenges').get()).docs.reduce((obj: {[challengeId: string]: Challenge}, doc) => {
-        obj[doc.id] = doc.data() as Challenge
-        return obj
-      }, {})
+      const getChallenges = async () =>
+        (await firestore.collection('challenges').get()).docs.reduce(
+          (obj: { [challengeId: string]: Challenge }, doc) => {
+            obj[doc.id] = doc.data() as Challenge
+            return obj
+          },
+          {}
+        )
 
       try {
         return await getChallenges()
@@ -179,11 +190,14 @@ const prepareDatabase = (
   },
   solves: {
     all: async () => {
-      const getSolves = async () => (await firestore
-        .collection('solves').get()).docs.reduce((obj:{[teamId:string]:Solves}, doc) => {
-        obj[doc.id] = doc.data()
-        return obj
-      }, {})
+      const getSolves = async () =>
+        (await firestore.collection('solves').get()).docs.reduce(
+          (obj: { [teamId: string]: Solves }, doc) => {
+            obj[doc.id] = doc.data()
+            return obj
+          },
+          {}
+        )
 
       try {
         return await getSolves()
@@ -228,23 +242,26 @@ const prepareDatabase = (
   }
 })
 
-
-
-export function init({credential, databaseURL}:{credential: {
-  projectId: string;
-  clientEmail: string;
-  privateKey: string;
-}, databaseURL:string}){
-
-const firebaseAdminInstance = admin.initializeApp({
-  credential: admin.credential.cert(credential),
+export function init ({
+  credential,
   databaseURL
-})
-const authAdmin = firebaseAdminInstance.auth()
-const firestore = firebaseAdminInstance.firestore()
+}: {
+  credential: {
+    projectId: string
+    clientEmail: string
+    privateKey: string
+  }
+  databaseURL: string
+}):Database {
+  const firebaseAdminInstance = admin.initializeApp({
+    credential: admin.credential.cert(credential),
+    databaseURL
+  })
+  const authAdmin = firebaseAdminInstance.auth()
+  const firestore = firebaseAdminInstance.firestore()
 
-const firebaseInstance = firebase.initializeApp(firebaseConfig)
-const auth = firebaseInstance.auth()
+  const firebaseInstance = firebase.initializeApp(firebaseConfig)
+  const auth = firebaseInstance.auth()
   const database = prepareDatabase(firestore, authAdmin, auth)
   return database
 }

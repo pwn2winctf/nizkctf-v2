@@ -64,12 +64,12 @@ export interface Database {
     }>
   }
   solves: {
-    all: () => Promise<{[teamId:string]:Solves}>
+    all: () => Promise<{ [teamId: string]: Solves }>
     get: (teamId: string) => Promise<Solves>
     register: (teamId: string, challengeId: string) => Promise<Solves>
   }
   challenges: {
-    all: () => Promise<{[challengeId:string]:Challenge}>
+    all: () => Promise<{ [challengeId: string]: Challenge }>
     get: (id: string) => Promise<Challenge>
   }
 }

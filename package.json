@@ -6,25 +6,32 @@
   "author": "Lorhan Sohaky",
   "license": "MIT",
   "main": "src/index.ts",
+  "engines": {
+    "node": "12.x"
+  },
   "scripts": {
     "start": "NODE_ENV=production node dist/src/index.js",
     "dev": "nodemon src/index.ts --ignore __tests__",
     "build": "tsc",
     "test": "jest",
-    "mutation-test": "stryker run"
-  },
-  "engines": {
-    "node": "12.x"
+    "test:mutation": "stryker run",
+    "lint": "eslint . --ext .ts,.json,.js,.md",
+    "lint:fix": "eslint . --ext .ts,.json,.js,.md --fix"
   },
   "lint-staged": {
-    "*.+(ts|js|json|css|md|json)": [
-      "prettier-standard --lint",
+    "*.+(ts|js|json|md)": [
+      "eslint . --ext .ts,.json,.js,.md --fix",
       "git add"
     ],
-    "+(src|__tests__)/**/*.+(ts|js|json|css|md)": [
-      "prettier-standard --lint",
+    "+(src|__tests__)/**/*.+(ts|js|json|md)": [
+      "eslint . --ext .ts,.json,.js,.md --fix",
       "git add"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "dependencies": {
     "compression": "^1.7.4",
@@ -56,9 +63,11 @@
     "@types/uuid": "^8.0.0",
     "@typescript-eslint/eslint-plugin": "^3.1.0",
     "@typescript-eslint/parser": "^3.1.0",
-    "eslint": "^7.1.0",
+    "eslint": "^7.14.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-json": "^2.1.2",
+    "eslint-plugin-markdown": "^1.0.2",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
@@ -66,11 +75,11 @@
     "jest": "^26.0.1",
     "jest-environment-uint8array": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
+    "lint-staged": "^10.5.1",
     "nodemon": "^2.0.4",
     "supertest": "^4.0.2",
     "ts-jest": "^26.1.0",
     "ts-node": "^8.10.2",
-    "tslint": "^6.1.2",
     "typescript": "^3.9.3",
     "uuid": "^8.1.0"
   }
