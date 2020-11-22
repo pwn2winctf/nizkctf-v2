@@ -4,7 +4,7 @@ import firebase from 'firebase'
 import { firebaseConfig } from '../constants.json'
 import { SemanticError, NotFoundError, AuthorizationError } from './types/errors.type'
 
-const credential = process.env.CREDS ? JSON.parse(process.env.CREDS) : require('../serviceAccountKey.json')
+const credential = JSON.parse(process.env.CREDS || '')
 
 
 const firebaseAdminInstance = admin.initializeApp({

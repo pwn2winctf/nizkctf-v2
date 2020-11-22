@@ -72,6 +72,7 @@ export default function score (database: Database): Router {
         res.set({
           'Cache-Control':'public, max-age=0, s-age=1, stale-while-revalidate'
         })
+        
         return res.status(200).json(score)
       } catch (err) {
         next(err)
