@@ -4,19 +4,6 @@ import firebase from 'firebase'
 import { firebaseConfig } from '../constants.json'
 import { SemanticError, NotFoundError, AuthorizationError } from './types/errors.type'
 
-const credential = JSON.parse(process.env.CREDS || '')
-
-
-const firebaseAdminInstance = admin.initializeApp({
-  credential: admin.credential.cert(credential),
-  databaseURL: 'https://test-pwn2win.firebaseio.com'
-})
-const authAdmin = firebaseAdminInstance.auth()
-const firestore = firebaseAdminInstance.firestore()
-
-const firebaseInstance = firebase.initializeApp(firebaseConfig)
-const auth = firebaseInstance.auth()
-
 const resolveFirebaseError = (err: FirebaseError) => {
   switch (err.code) {
     case 'auth/email-already-exists':
@@ -241,6 +228,23 @@ const prepareDatabase = (
   }
 })
 
-const database = prepareDatabase(firestore, authAdmin, auth)
 
-export default database
+
+export function init({credential, databaseURL}:{credential: {
+  projectId: string;
+  clientEmail: string;
+  privateKey: string;
+}, databaseURL:string}){
+
+const firebaseAdminInstance = admin.initializeApp({
+  credential: admin.credential.cert(credential),
+  databaseURL
+})
+const authAdmin = firebaseAdminInstance.auth()
+const firestore = firebaseAdminInstance.firestore()
+
+const firebaseInstance = firebase.initializeApp(firebaseConfig)
+const auth = firebaseInstance.auth()
+  const database = prepareDatabase(firestore, authAdmin, auth)
+  return database
+}
