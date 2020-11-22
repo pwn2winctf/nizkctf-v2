@@ -55,6 +55,7 @@ const prepareDatabase = (
         countries,
         members
       })
+
       return { id: data.id, name, countries, members }
     },
     get: async id => {
@@ -140,6 +141,9 @@ const prepareDatabase = (
         }
         return { user: data, token, refreshToken: user.refreshToken }
       } catch (err) {
+        if (err instanceof AuthorizationError || err instanceof NotFoundError) {
+          throw err
+        }
         throw new (resolveFirebaseError(err))(err.message)
       }
     }
@@ -184,6 +188,9 @@ const prepareDatabase = (
         } as Challenge
         return challenge
       } catch (err) {
+        if (err instanceof NotFoundError) {
+          throw err
+        }
         throw new (resolveFirebaseError(err))(err.message)
       }
     }
@@ -236,6 +243,9 @@ const prepareDatabase = (
         const solves = {} as Solves
         return solves
       } catch (err) {
+        if (err instanceof NotFoundError) {
+          throw err
+        }
         throw new (resolveFirebaseError(err))(err.message)
       }
     }
