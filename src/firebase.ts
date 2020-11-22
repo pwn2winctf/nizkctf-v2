@@ -41,7 +41,7 @@ const prepareDatabase = (
         ).data()
 
         if (currentTeam) {
-          throw new SemanticError('you are already part of a team')
+          throw new SemanticError('you are already member of a team')
         }
 
         await firestore
