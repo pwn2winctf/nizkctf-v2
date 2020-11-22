@@ -2,6 +2,7 @@ import express, { Express } from 'express'
 import compression from 'compression'
 import helmet from 'helmet'
 import morgan from 'morgan'
+import cors from 'cors'
 
 import routes from './routes'
 import errorHandler from './middlewares/error.middleware'
@@ -80,6 +81,7 @@ export default function App (args: AppInterface): Express {
   app.use(express.json())
   app.use(compression())
   app.use(helmet())
+  app.use(cors())
   app.use(morgan('combined'))
 
   app.use('/', routes(database))
