@@ -1,6 +1,7 @@
-import { Database, Challenge, Solves } from './app'
 import admin, { FirebaseError } from 'firebase-admin'
 import firebase from 'firebase'
+
+import { Database, Challenge, Solves } from './app'
 import { firebaseConfig } from '../constants.json'
 import {
   SemanticError,
@@ -16,6 +17,7 @@ const resolveFirebaseError = (err: FirebaseError) => {
     case 'auth/invalid-display-name':
     case 'auth/invalid-email':
     case 'auth/invalid-password':
+    case 'auth/id-token-expired':
       return SemanticError
     case 'auth/user-not-found':
     case 'auth/uid-already-exists':
