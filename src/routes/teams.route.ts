@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express'
-import { check, validationResult } from 'express-validator'
+import { validationResult } from 'express-validator'
 import { createHash } from 'crypto'
 
 import { Database } from '../app'
