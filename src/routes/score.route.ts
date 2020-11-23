@@ -1,9 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express'
+import apiCache from 'apicache'
 
 import { Database } from '../app'
 import { computeScore } from '../utils'
-
-import apiCache from 'apicache'
 
 interface TaskStat {
   points: number

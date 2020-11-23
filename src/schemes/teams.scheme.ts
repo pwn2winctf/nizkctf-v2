@@ -1,4 +1,5 @@
 import { check, ValidationChain } from 'express-validator'
+
 import * as constants from '../../constants.json'
 
 export const newTeamScheme:ValidationChain[] = [
