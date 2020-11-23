@@ -16,7 +16,7 @@
     "noImplicitThis": true,                
     "alwaysStrict": true,                  
     "noUnusedLocals": true,                
-    "noUnusedParameters": true,            
+    "noUnusedParameters": false,            
     "noImplicitReturns": false,             
     "noFallthroughCasesInSwitch": true,    
     "esModuleInterop": true,
