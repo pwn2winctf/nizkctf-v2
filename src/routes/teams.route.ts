@@ -11,7 +11,7 @@ import {
 } from '../types/errors.type'
 
 import { authenticatedScheme, recaptchaScheme } from '../schemes'
-import { newTeamScheme } from '../schemes/teams.scheme'
+import { newSolveScheme, newTeamScheme } from '../schemes/teams.scheme'
 
 import validate from '../middlewares/validation.middleware'
 import recaptchaMiddleware from '../middlewares/recaptcha.middleware'
@@ -50,8 +50,7 @@ export default function teams (database: Database): Router {
 
   router.post(
     '/:teamId/solves',
-    authenticatedScheme, validate,
-    [check('challengeId').isString(), check('proof').isBase64()],
+    authenticatedScheme.concat(newSolveScheme), validate,
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         const errors = validationResult(req)

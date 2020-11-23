@@ -12,3 +12,5 @@ export const newTeamScheme:ValidationChain[] = [
       countries.every((item: string) => constants.countries.includes(item))
     )
 ]
+
+export const newSolveScheme:ValidationChain[] = [check('challengeId').isString(), check('proof').isBase64()]
