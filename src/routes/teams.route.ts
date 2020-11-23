@@ -9,16 +9,19 @@ import {
   SemanticError,
   AuthorizationError
 } from '../types/errors.type'
+
+import { authenticatedScheme, recaptchaScheme } from '../schemes'
 import { newTeamScheme } from '../schemes/teams.scheme'
+
 import validate from '../middlewares/validation.middleware'
-import { authenticatedScheme } from '../schemes'
+import recaptchaMiddleware from '../middlewares/recaptcha.middleware'
 
 export default function teams (database: Database): Router {
   const router = Router()
 
   router.post(
     '/',
-    newTeamScheme, validate, async (req: Request, res: Response, next: NextFunction) => {
+    newTeamScheme.concat(recaptchaScheme), validate, recaptchaMiddleware, async (req: Request, res: Response, next: NextFunction) => {
       try {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {

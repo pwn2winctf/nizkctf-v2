@@ -1,16 +1,19 @@
 import { Router, Request, Response, NextFunction } from 'express'
 
 import { Database } from '../app'
+
+import { recaptchaScheme } from '../schemes'
 import { loginUserScheme, newUserScheme } from '../schemes/users.scheme'
+
 import validate from '../middlewares/validation.middleware'
+import recaptchaMiddleware from '../middlewares/recaptcha.middleware'
 
 export default function users (database: Database): Router {
   const router = Router()
 
   router.post(
     '/',
-    newUserScheme,
-    validate,
+    newUserScheme.concat(recaptchaScheme), validate, recaptchaMiddleware,
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         const { email, password, displayName } = req.body
