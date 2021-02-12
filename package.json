@@ -6,7 +6,7 @@
   "author": "Lorhan Sohaky",
   "license": "MIT",
   "main": "src/index.ts",
-  "private":true,
+  "private": true,
   "engines": {
     "node": "12.x"
   },
