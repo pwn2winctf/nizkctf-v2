@@ -81,6 +81,24 @@ const prepareDatabase = (
         members: data.members
       }
       return team
+    },
+    list: async () => {
+      const data = (
+        await firestore
+          .collection('teams').get()
+      ).docs.map(doc => doc.data())
+
+      if (!data) {
+        return []
+      }
+
+      const teams = data.map(item => ({
+        name: item.name,
+        countries: item.countries,
+        members: item.members
+      }))
+
+      return teams
     }
   },
   users: {
@@ -266,7 +284,7 @@ export function init ({
     privateKey: string
   }
   databaseURL: string
-}):Database {
+}): Database {
   const firebaseAdminInstance = admin.initializeApp({
     credential: admin.credential.cert(credential),
     databaseURL

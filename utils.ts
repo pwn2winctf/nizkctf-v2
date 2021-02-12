@@ -68,6 +68,11 @@ export function prepareDatabase (store: DatabaseStructure): Database {
       }
 
       return { id, ...item }
+    },
+    list: async () => {
+      const teams = Object.values(store.teams)
+
+      return teams
     }
   }
 

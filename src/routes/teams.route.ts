@@ -105,5 +105,17 @@ export default function teams (database: Database): Router {
     }
   )
 
+  router.get(
+    '/', async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const data = await database.teams.list()
+
+        res.status(200).send(data)
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
   return router
 }
