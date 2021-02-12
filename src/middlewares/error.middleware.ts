@@ -3,7 +3,8 @@ import {
   ValidationError,
   AuthorizationError,
   SemanticError,
-  NotFoundError
+  NotFoundError,
+  MissingTokenError
 } from '../types/errors.type'
 
 interface ArgsInterface {
@@ -47,6 +48,15 @@ const validationErrorHandler: ArgsInterface = (err, _, res, next) => {
   next(err)
 }
 
+const missingTokenErrorHandler: ArgsInterface = (err, _, res, next) => {
+  if (err instanceof MissingTokenError) {
+    const error: ErrorItem = { code: 'authorization', message: err.message }
+    return res.status(err.statusCode).json({ errors: [error] })
+  }
+
+  next(err)
+}
+
 const authorizationErrorHandler: ArgsInterface = (err, _, res, next) => {
   if (err instanceof AuthorizationError) {
     const error: ErrorItem = { code: 'authorization', message: err.message }
@@ -77,6 +87,7 @@ const notFoundErrorHandler: ArgsInterface = (err, _, res, next) => {
 }
 
 const errorHandlerWrapper = (app: Express): Express => {
+  app.use(missingTokenErrorHandler)
   app.use(authorizationErrorHandler)
   app.use(validationErrorHandler)
   app.use(semanticErrorHandler)

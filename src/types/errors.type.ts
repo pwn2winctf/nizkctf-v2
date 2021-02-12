@@ -22,6 +22,14 @@ export class ValidationError extends HttpError {
   }
 }
 
+export class MissingTokenError extends HttpError {
+  constructor (message: string, statusCode = 401) {
+    super(statusCode, message)
+
+    Object.setPrototypeOf(this, MissingTokenError.prototype)
+  }
+}
+
 export class AuthorizationError extends HttpError {
   constructor (message: string, statusCode = 403) {
     super(statusCode, message)

@@ -21,7 +21,7 @@ export default function teams (database: Database): Router {
 
   router.post(
     '/',
-    newTeamScheme.concat(recaptchaScheme), validate, recaptchaMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    authenticatedScheme.concat(newTeamScheme.concat(recaptchaScheme)), validate, recaptchaMiddleware, async (req: Request, res: Response, next: NextFunction) => {
       try {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
@@ -34,7 +34,7 @@ export default function teams (database: Database): Router {
 
         const name: string = req.body.name
         const countries: string[] = req.body.countries
-        const token:string = req.headers.authorization
+        const token: string = req.headers.authorization
         const user = await database.users.current(token)
 
         const teamData = { name, countries, members: [user.uuid] }
