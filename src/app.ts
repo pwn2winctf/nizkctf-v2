@@ -51,7 +51,7 @@ export interface Database {
     get: (id: string) => Promise<{ id: string }>
     current: (
       token: string
-    ) => Promise<{ uuid: string; email: string; displayName: string }>
+    ) => Promise<{ uuid: string; email: string; displayName: string, team?: Omit<Team, 'members'> }>
     login: ({
       email,
       password

@@ -1,7 +1,7 @@
 import admin, { FirebaseError } from 'firebase-admin'
 import firebase from 'firebase'
 
-import { Database, Challenge, Solves } from './app'
+import { Database, Challenge, Solves, Team } from './app'
 import { firebaseConfig } from '../constants.json'
 import {
   SemanticError,
@@ -134,10 +134,39 @@ const prepareDatabase = (
         if (!user.email || !user.displayName) {
           throw new Error('Invalid user data')
         }
-        return {
-          uuid: tokenData.uid,
-          email: user.email,
-          displayName: user.displayName
+
+        const currentTeam = (
+          await firestore
+            .collection('team_members')
+            .doc(user.uid)
+            .get()
+        ).data()
+
+        if (currentTeam) {
+          const doc = (
+            await firestore
+              .collection('teams').where('name', '==', currentTeam.team).limit(1).get()
+          ).docs[0]
+          const data = doc.data()
+
+          const team: Omit<Team, 'members'> = {
+            id: doc.id,
+            name: data.name,
+            countries: data.countries
+          }
+
+          return {
+            uuid: tokenData.uid,
+            email: user.email,
+            displayName: user.displayName,
+            team
+          }
+        } else {
+          return {
+            uuid: tokenData.uid,
+            email: user.email,
+            displayName: user.displayName
+          }
         }
       } catch (err) {
         throw new (resolveFirebaseError(err))(err.message)

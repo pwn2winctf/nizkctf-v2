@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express'
 
 import { Database } from '../app'
 
-import { recaptchaScheme } from '../schemes'
+import { authenticatedScheme, recaptchaScheme } from '../schemes'
 import { loginUserScheme, newUserScheme } from '../schemes/users.scheme'
 
 import validate from '../middlewares/validation.middleware'
@@ -38,6 +38,21 @@ export default function users (database: Database): Router {
         const { email, password } = req.body
 
         const data = await database.users.login({ email, password })
+        res.status(200).send(data)
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
+  router.get(
+    '/me',
+    authenticatedScheme, validate,
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const token: string = req.headers.authorization || ''
+
+        const data = await database.users.current(token)
         res.status(200).send(data)
       } catch (err) {
         next(err)
