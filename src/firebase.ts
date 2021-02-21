@@ -86,16 +86,19 @@ const prepareDatabase = (
       const data = (
         await firestore
           .collection('teams').get()
-      ).docs.map(doc => doc.data())
+      ).docs.map(doc => {
+        const docData = doc.data()
+        return { id: doc.id, name: docData.name, countries: docData.countries, members: docData.members }
+      })
 
       if (!data) {
         return []
       }
 
       const teams = data.map(item => ({
+        id: item.id,
         name: item.name,
-        countries: item.countries,
-        members: item.members
+        countries: item.countries
       }))
 
       return teams

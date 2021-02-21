@@ -36,7 +36,7 @@ export interface Database {
   teams: {
     register: (team: Omit<Team, 'id'>) => Promise<Team>
     get: (id: string) => Promise<Team>
-    list: () => Promise<Array<Omit<Team, 'id'>>>
+    list: () => Promise<Array<Omit<Team, 'members'>>>
   }
   users: {
     register: ({
