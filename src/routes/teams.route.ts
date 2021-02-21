@@ -1,11 +1,9 @@
 import { Router, Request, Response, NextFunction } from 'express'
-import { validationResult } from 'express-validator'
 import { createHash } from 'crypto'
 
 import { Database } from '../app'
 import { cryptoSignOpen } from '../libsodium'
 import {
-  ValidationError,
   SemanticError,
   AuthorizationError
 } from '../types/errors.type'
@@ -23,11 +21,6 @@ export default function teams (database: Database): Router {
     '/',
     authenticatedScheme.concat(newTeamScheme.concat(recaptchaScheme)), validate, recaptchaMiddleware, async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
-          throw new ValidationError(errors)
-        }
-
         if (!req.headers.authorization) {
           throw new Error('Authorization is required')
         }
@@ -53,11 +46,6 @@ export default function teams (database: Database): Router {
     authenticatedScheme.concat(newSolveScheme), validate,
     async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
-          throw new ValidationError(errors)
-        }
-
         if (!req.headers.authorization) {
           throw new Error('Authorization is required')
         }
