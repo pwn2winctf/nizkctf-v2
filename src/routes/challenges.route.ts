@@ -10,7 +10,7 @@ export default function challenges (database: Database): Router {
 
   router.get('/', cache('10 seconds'), async (_: Request, res: Response, next: NextFunction) => {
     try {
-      const challenges = await database.challenges.all()
+      const challenges = Object.values(await database.challenges.all())
 
       res.status(200).json(challenges)
     } catch (err) {
