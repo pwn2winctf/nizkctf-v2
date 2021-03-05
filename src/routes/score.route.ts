@@ -83,7 +83,7 @@ export default function score (database: Database): Router {
 
       const standings: Standing[] = temporaryStandings.map((item, index) => ({
         ...item,
-        pos: index
+        pos: index + 1
       }))
 
       const score: Score = { tasks, standings } as Score
