@@ -70,7 +70,7 @@ export function prepareDatabase (store: DatabaseStructure): Database {
       return { id, ...item }
     },
     list: async () => {
-      const teams = Object.values(store.teams)
+      const teams = Object.entries(store.teams).map(([id, { members, ...item }]) => ({ id, ...item }))
 
       return teams
     }
