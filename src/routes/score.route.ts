@@ -1,5 +1,4 @@
 import { Router, Request, Response, NextFunction } from 'express'
-import apiCache from 'apicache'
 
 import { Database } from '../app'
 import { computeScore } from '../utils'
@@ -24,12 +23,10 @@ interface Score {
   tasks: string[]
 }
 
-const cache = apiCache.middleware
-
 export default function score (database: Database): Router {
   const router = Router()
 
-  router.get('/', cache('5 seconds'), async (_: Request, res: Response, next: NextFunction) => {
+  router.get('/', async (_: Request, res: Response, next: NextFunction) => {
     try {
       const challenges = await database.challenges.all()
       const solves = await database.solves.all()
@@ -90,6 +87,8 @@ export default function score (database: Database): Router {
       }))
 
       const score: Score = { tasks, standings } as Score
+
+      res.setHeader('Cache-Control', 'max-age=5, s-maxage=15, stale-while-revalidate, public')
 
       res.status(200).json(score)
     } catch (err) {

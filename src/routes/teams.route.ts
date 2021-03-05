@@ -98,6 +98,7 @@ export default function teams (database: Database): Router {
       try {
         const data = await database.teams.list()
 
+        res.setHeader('Cache-Control', 'max-age=5, s-maxage=15, stale-while-revalidate, public')
         res.status(200).send(data)
       } catch (err) {
         next(err)
