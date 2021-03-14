@@ -110,9 +110,11 @@ export function prepareDatabase (store: DatabaseStructure): Database {
       const uuid = userEntries[0]
       const { displayName } = userEntries[1]
 
+      const token = createJWTToken({ userId: uuid, email, displayName: displayName, verified: true })
+
       return {
         user: { uuid, email, displayName },
-        token: uuid,
+        token: token,
         refreshToken: uuid
       }
     },
