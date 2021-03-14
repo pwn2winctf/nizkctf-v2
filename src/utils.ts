@@ -1,5 +1,5 @@
 import { createHash } from 'crypto'
-import jwtDecode from 'jwt-decode'
+import jwt from 'jsonwebtoken'
 
 import { dynamic_scoring as dynamicScore } from '../constants.json'
 import { MissingTokenError } from './types/errors.type'
@@ -22,7 +22,7 @@ export function createSHA256 (data: string): string {
 export async function getUserDataFromJWT (token: string): Promise<{ uid: string, email: string, verified: boolean, displayName: string }> {
   try {
     // eslint-disable-next-line
-    const { user_id: uid, email, display_name: displayName, verified } = jwtDecode(token) as { user_id: string, email: string, verified: boolean, display_name: string }
+    const { user_id: uid, email, display_name: displayName, verified } = jwt.decode(token) as { user_id: string, email: string, verified: boolean, display_name: string }
 
     return { uid, email, displayName, verified }
   } catch (err) {
