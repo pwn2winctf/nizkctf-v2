@@ -7,6 +7,7 @@ import { loginUserScheme, newUserScheme } from '../schemes/users.scheme'
 
 import validate from '../middlewares/validation.middleware'
 import recaptchaMiddleware from '../middlewares/recaptcha.middleware'
+import { validateToken } from '../authorization'
 
 export default function users (database: Database): Router {
   const router = Router()
@@ -50,7 +51,11 @@ export default function users (database: Database): Router {
     authenticatedScheme, validate,
     async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const token: string = req.headers.authorization || ''
+        if (!req.headers.authorization) {
+          throw new Error('Authorization is required')
+        }
+        const token: string = req.headers.authorization
+        await validateToken(token)
 
         const data = await database.users.current(token)
         res.status(200).send(data)

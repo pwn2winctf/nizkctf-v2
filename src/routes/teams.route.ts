@@ -13,6 +13,7 @@ import { newSolveScheme, newTeamScheme } from '../schemes/teams.scheme'
 
 import validate from '../middlewares/validation.middleware'
 import recaptchaMiddleware from '../middlewares/recaptcha.middleware'
+import { validateToken } from '../authorization'
 
 export default function teams (database: Database): Router {
   const router = Router()
@@ -25,12 +26,14 @@ export default function teams (database: Database): Router {
           throw new Error('Authorization is required')
         }
 
+        const token: string = req.headers.authorization
+
+        const { uid } = await validateToken(token)
+
         const name: string = req.body.name
         const countries: string[] = req.body.countries
-        const token: string = req.headers.authorization
-        const user = await database.users.current(token)
 
-        const teamData = { name, countries, members: [user.uuid] }
+        const teamData = { name, countries, members: [uid] }
 
         const data = await database.teams.register(teamData)
 
@@ -49,17 +52,18 @@ export default function teams (database: Database): Router {
         if (!req.headers.authorization) {
           throw new Error('Authorization is required')
         }
-
         const token = req.headers.authorization
+
+        const { uid } = await validateToken(token)
+
         const teamId: string = req.params.teamId
         const challengeId: string = req.body.challengeId
         const proof = Buffer.from(req.body.proof, 'base64')
 
-        const user = await database.users.current(token)
         const team = await database.teams.get(teamId)
         const solves = await database.solves.get(teamId)
 
-        if (!team.members.includes(user.uuid)) {
+        if (!team.members.includes(uid)) {
           throw new AuthorizationError("you don't belong on this team")
         }
 
