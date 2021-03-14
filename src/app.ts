@@ -83,7 +83,7 @@ export default function App (args: AppInterface): Express {
   app.use(compression())
   app.use(helmet())
   app.use(cors())
-  app.use(morgan('combined'))
+  app.use(morgan('combined', { skip: (req, res) => process.env.NODE_ENV === 'test' }))
 
   app.use('/', routes(database))
 
