@@ -6,6 +6,7 @@ import libsodium from 'libsodium-wrappers'
 import { Database, Challenge, Solves } from './src/app'
 import { cryptoSignSeedKeypair, cryptoSign } from './src/libsodium'
 import { SemanticError, NotFoundError } from './src/types/errors.type'
+import { FIREBASE_CREDENTIALS } from './src/config'
 
 export type APIError = {
   code: string
@@ -225,9 +226,8 @@ export async function claimFlag (
   return encodedProof
 }
 
-export function createJWTToken ({ userId, email, verified, displayName }: { userId: string, email: string, verified: boolean, displayName: string }): string {
-  const privateKey = 'Private key'
-  const token = jwt.sign({ user_id: userId, display_name: displayName, email, verified }, privateKey, { algorithm: 'HS256' })
+export function createJWTToken ({ userId, email, verified, displayName }: { userId: string, email: string, verified: boolean, displayName: string }, privateKey?: string): string {
+  const token = jwt.sign({ user_id: userId, display_name: displayName, email, verified }, privateKey || FIREBASE_CREDENTIALS.private_key, { algorithm: 'RS256' })
 
   return token
 }
