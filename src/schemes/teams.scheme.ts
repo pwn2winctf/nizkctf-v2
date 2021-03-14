@@ -13,4 +13,4 @@ export const newTeamScheme:ValidationChain[] = [
     )
 ]
 
-export const newSolveScheme:ValidationChain[] = [check('challengeId').isString(), check('proof').isBase64()]
+export const newSolveScheme:ValidationChain[] = [check('challengeId').isString(), check('proof').isString().isBase64()]
