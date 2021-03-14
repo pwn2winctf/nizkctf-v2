@@ -6,6 +6,7 @@ import cors from 'cors'
 
 import routes from './routes'
 import errorHandler from './middlewares/error.middleware'
+import { APP_ENV } from './config'
 
 export interface AppInterface {
   port?: number
@@ -83,7 +84,7 @@ export default function App (args: AppInterface): Express {
   app.use(compression())
   app.use(helmet())
   app.use(cors())
-  app.use(morgan('combined', { skip: () => process.env.NODE_ENV === 'test' }))
+  app.use(morgan('combined', { skip: () => APP_ENV === 'test' }))
 
   app.use('/', routes(database))
 
