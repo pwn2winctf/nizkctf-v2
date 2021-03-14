@@ -8,6 +8,7 @@ import {
   NotFoundError,
   AuthorizationError
 } from '../types/errors.type'
+import { getUserDataFromJWT } from '../utils'
 
 const resolveFirebaseError = (err: FirebaseError) => {
   switch (err.code) {
@@ -130,9 +131,9 @@ const prepareDatabase = (
     },
     current: async token => {
       try {
-        const tokenData = await authAdmin.verifyIdToken(token)
+        const { uid } = await getUserDataFromJWT(token)
 
-        const user = await authAdmin.getUser(tokenData.uid)
+        const user = await authAdmin.getUser(uid)
 
         if (!user.email || !user.displayName) {
           throw new Error('Invalid user data')
@@ -141,7 +142,7 @@ const prepareDatabase = (
         const currentTeam = (
           await firestore
             .collection('team_members')
-            .doc(user.uid)
+            .doc(uid)
             .get()
         ).data()
 
@@ -159,14 +160,14 @@ const prepareDatabase = (
           }
 
           return {
-            uid: tokenData.uid,
+            uid: uid,
             email: user.email,
             displayName: user.displayName,
             team
           }
         } else {
           return {
-            uid: tokenData.uid,
+            uid: uid,
             email: user.email,
             displayName: user.displayName
           }
