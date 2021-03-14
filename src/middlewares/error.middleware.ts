@@ -93,9 +93,10 @@ const errorHandlerWrapper = (app: Express): Express => {
   app.use(semanticErrorHandler)
   app.use(notFoundErrorHandler)
 
-  app.use((err: Error, _: Request, res: Response) => {
+  app.use((err: Error, _: Request, res: Response, next:NextFunction) => {
     console.error(err)
-    res.status(500).json({
+
+    return res.status(500).json({
       errors: [{ code: 'internal', message: 'Internal server error' }]
     })
   })
