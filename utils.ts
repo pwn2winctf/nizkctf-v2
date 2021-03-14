@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
+import jwt from 'jsonwebtoken'
 import { createHash } from 'crypto'
 import libsodium from 'libsodium-wrappers'
 
@@ -220,4 +221,11 @@ export async function claimFlag (
   const encodedProof = Buffer.from(proof).toString('base64')
 
   return encodedProof
+}
+
+export function createJWTToken ({ userId, email, verified, displayName }: { userId: string, email: string, verified: boolean, displayName: string }): string {
+  const privateKey = 'Private key'
+  const token = jwt.sign({ user_id: userId, display_name: displayName, email, verified }, privateKey, { algorithm: 'HS256' })
+
+  return token
 }
