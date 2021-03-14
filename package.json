@@ -14,8 +14,8 @@
     "start": "NODE_ENV=production node dist/src/index.js",
     "dev": "nodemon src/index.ts --ignore __tests__",
     "build": "tsc",
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "jest --runInBand --detectOpenHandles",
+    "test:watch": "jest --watch --runInBand --detectOpenHandles",
     "test:mutation": "stryker run",
     "lint": "eslint . --ext .ts,.json,.js,.md",
     "lint:fix": "eslint . --ext .ts,.json,.js,.md --fix"
