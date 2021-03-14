@@ -47,11 +47,11 @@ export interface Database {
       email: string
       password: string
       displayName: string
-    }) => Promise<{ uuid: string; email: string; displayName: string }>
+    }) => Promise<{ uid: string; email: string; displayName: string }>
     get: (id: string) => Promise<{ id: string }>
     current: (
-      token: string
-    ) => Promise<{ uuid: string; email: string; displayName: string, team?: Omit<Team, 'members'> }>
+      uid: string
+    ) => Promise<{ uid: string; email: string; displayName: string, team?: Omit<Team, 'members'> }>
     login: ({
       email,
       password
@@ -59,7 +59,7 @@ export interface Database {
       email: string
       password: string
     }) => Promise<{
-      user: { uuid: string; email: string; displayName: string }
+      user: { uid: string; email: string; displayName: string }
       token: string
       refreshToken: string
     }>
@@ -83,7 +83,7 @@ export default function App (args: AppInterface): Express {
   app.use(compression())
   app.use(helmet())
   app.use(cors())
-  app.use(morgan('combined', { skip: (req, res) => process.env.NODE_ENV === 'test' }))
+  app.use(morgan('combined', { skip: () => process.env.NODE_ENV === 'test' }))
 
   app.use('/', routes(database))
 

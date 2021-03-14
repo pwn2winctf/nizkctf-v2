@@ -71,7 +71,7 @@ export function prepareDatabase (store: DatabaseStructure): Database {
       return { id, ...item }
     },
     list: async () => {
-      const teams = Object.entries(store.teams).map(([id, { members, ...item }]) => ({ id, ...item }))
+      const teams = Object.entries(store.teams).map(([id, { name, countries }]) => ({ id, name, countries }))
 
       return teams
     }
@@ -86,14 +86,14 @@ export function prepareDatabase (store: DatabaseStructure): Database {
       const uuid = uuidv4()
       store.users[uuid] = { email, password, displayName }
 
-      return { uuid, email, displayName }
+      return { uid: uuid, email, displayName }
     },
     current: async token => {
       const userData = store.users[token]
       if (!userData) {
         throw new NotFoundError('User not found')
       }
-      return { uuid: token, ...userData }
+      return { uid: token, ...userData }
     },
     login: async ({ email, password }) => {
       const userEntries = Object.entries(store.users).find(
@@ -113,7 +113,7 @@ export function prepareDatabase (store: DatabaseStructure): Database {
       const token = createJWTToken({ userId: uuid, email, displayName: displayName, verified: true })
 
       return {
-        user: { uuid, email, displayName },
+        user: { uid: uuid, email, displayName },
         token: token,
         refreshToken: uuid
       }

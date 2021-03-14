@@ -1,13 +1,13 @@
 import admin, { FirebaseError } from 'firebase-admin'
 import firebase from 'firebase'
 
-import { Database, Challenge, Solves, Team } from './app'
-import { firebaseConfig } from '../constants.json'
+import { Database, Challenge, Solves, Team } from '../app'
+import { firebaseConfig } from '../../constants.json'
 import {
   SemanticError,
   NotFoundError,
   AuthorizationError
-} from './types/errors.type'
+} from '../types/errors.type'
 
 const resolveFirebaseError = (err: FirebaseError) => {
   switch (err.code) {
@@ -123,7 +123,7 @@ const prepareDatabase = (
         await userCredentials.user.updateProfile({ displayName })
         await userCredentials.user.sendEmailVerification()
 
-        return { uuid: userCredentials.user.uid, email, displayName }
+        return { uid: userCredentials.user.uid, email, displayName }
       } catch (err) {
         throw new (resolveFirebaseError(err))(err.message)
       }
@@ -159,14 +159,14 @@ const prepareDatabase = (
           }
 
           return {
-            uuid: tokenData.uid,
+            uid: tokenData.uid,
             email: user.email,
             displayName: user.displayName,
             team
           }
         } else {
           return {
-            uuid: tokenData.uid,
+            uid: tokenData.uid,
             email: user.email,
             displayName: user.displayName
           }
@@ -189,7 +189,7 @@ const prepareDatabase = (
 
         const token = await user.getIdToken()
         const data = {
-          uuid: user.uid,
+          uid: user.uid,
           email: user.email || email,
           displayName: user.displayName || ''
         }

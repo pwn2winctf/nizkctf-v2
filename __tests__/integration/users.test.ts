@@ -27,11 +27,11 @@ describe('Users endpoints', () => {
       .post('/users')
       .send(data)
 
-    const uuid: string = body.uuid
+    const uid: string = body.uid
     const email: string = body.email
     const displayName: string = body.displayName
 
-    expect(uuid.length).toBeGreaterThan(0)
+    expect(uid.length).toBeGreaterThan(0)
     expect(email).toEqual(data.email)
     expect(displayName).toEqual(data.displayName)
 
@@ -94,12 +94,12 @@ describe('Users endpoints', () => {
       .post('/users/login')
       .send(data)
 
-    const user: { uuid: string; email: string; displayName: string } = body.user
+    const user: { uid: string; email: string; displayName: string } = body.user
     const token: string = body.token
     const refreshToken: string = body.refreshToken
-    const { uuid, email, displayName } = user
+    const { uid, email, displayName } = user
 
-    expect(uuid.length).toBeGreaterThan(0)
+    expect(uid.length).toBeGreaterThan(0)
     expect(email).toEqual(data.email)
     expect(displayName).toEqual(data.displayName)
     expect(token.length).toBeGreaterThan(0)

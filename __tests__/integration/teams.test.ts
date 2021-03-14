@@ -11,7 +11,7 @@ const store: DatabaseStructure = {
 }
 
 const user = {
-  uuid: '',
+  uid: '',
   email: 'lorhan@mailinator.com',
   displayName: 'Lorhan Sohaky',
   password: '123456'
@@ -28,7 +28,7 @@ describe('Teams endpoints', () => {
 
     await database.users.register(user)
     const data = await database.users.login(user)
-    user.uuid = data.user.uuid
+    user.uid = data.user.uid
     token = data.token
   })
 
@@ -69,7 +69,7 @@ describe('Teams endpoints', () => {
       name: 'Team test',
       countries: ['br', 'us', 'jp', 'zw', 'pt']
     }
-    database.teams.register({ ...data, members: [user.uuid] })
+    database.teams.register({ ...data, members: [user.uid] })
 
     const { body, status } = await request(app({ database }))
       .post('/teams')

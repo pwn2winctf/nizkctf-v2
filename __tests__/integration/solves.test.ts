@@ -27,7 +27,7 @@ const initialState: DatabaseStructure = {
 const store: DatabaseStructure = Object.create(initialState)
 
 const user = {
-  uuid: '',
+  uid: '',
   email: 'lorhan@mailinator.com',
   displayName: 'Lorhan Sohaky',
   password: '123456'
@@ -57,12 +57,12 @@ describe('Teams solves', () => {
 
     const database = prepareDatabase(store)
 
-    const { uuid } = await database.users.register(user)
+    const { uid } = await database.users.register(user)
     const data = await database.users.login(user)
     token = data.token
-    user.uuid = uuid
+    user.uid = uid
 
-    team = await database.teams.register({ ...team, members: [user.uuid] })
+    team = await database.teams.register({ ...team, members: [user.uid] })
     team2 = await database.teams.register({
       ...team2,
       members: ['random_uuid']
