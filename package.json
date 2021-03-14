@@ -15,6 +15,7 @@
     "dev": "nodemon src/index.ts --ignore __tests__",
     "build": "tsc",
     "test": "jest",
+    "test:watch": "jest --watch",
     "test:mutation": "stryker run",
     "lint": "eslint . --ext .ts,.json,.js,.md",
     "lint:fix": "eslint . --ext .ts,.json,.js,.md --fix"
