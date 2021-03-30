@@ -8,7 +8,7 @@ import {
   NotFoundError,
   AuthorizationError
 } from '../types/errors.type'
-import { getUserDataFromJWT } from '../utils'
+import { createSHA256, getUserDataFromJWT } from '../utils'
 
 const resolveFirebaseError = (err: FirebaseError) => {
   switch (err.code) {
@@ -47,6 +47,14 @@ const prepareDatabase = (
           throw new SemanticError('you are already member of a team')
         }
 
+        const teamId = createSHA256(name)
+
+        const teamData = (await firestore.collection('teams').doc(teamId).get()).data()
+
+        if (teamData) {
+          throw new SemanticError('Already exists this team')
+        }
+
         await firestore
           .collection('team_members')
           .doc(members[0])
@@ -54,13 +62,13 @@ const prepareDatabase = (
             team: name
           })
 
-        const data = await firestore.collection('teams').add({
+        await firestore.collection('teams').doc(teamId).set({
           name,
           countries,
           members
         })
 
-        return { id: data.id, name, countries, members }
+        return { id: teamId, name, countries, members }
       })
     },
     get: async id => {
@@ -319,7 +327,7 @@ export function init ({
   databaseURL: string
 }): Database {
   const firebaseAdminInstance = admin.initializeApp({
-    credential: admin.credential.cert(credential),
+    credential: admin.credential.cert(JSON.stringify(credential)),
     databaseURL
   })
   const authAdmin = firebaseAdminInstance.auth()
