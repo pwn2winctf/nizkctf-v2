@@ -20,7 +20,7 @@ async function validateFirebaseToken (token: string): Promise<{ uid: string, ver
     return { uid, verified: verified || false }
   } catch (err) {
     const error = err as FirebaseError
-    if (['auth/id-token-expired', 'auth/id-token-revoked', 'auth/invalid-id-token'].includes(error.code) || error.message.includes('has no')) {
+    if (['auth/id-token-expired', 'auth/id-token-revoked', 'auth/invalid-id-token', 'auth/argument-error'].includes(error.code) || error.message.includes('has no')) {
       throw new AuthorizationError('Invalid token')
     } else {
       console.error(err)
