@@ -16,7 +16,6 @@
     "build": "tsc",
     "test": "jest --runInBand --detectOpenHandles",
     "test:watch": "jest --watch --runInBand --detectOpenHandles",
-    "test:mutation": "stryker run",
     "lint": "eslint . --ext .ts,.json,.js,.md",
     "lint:fix": "eslint . --ext .ts,.json,.js,.md --fix"
   },
@@ -51,9 +50,6 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
-    "@stryker-mutator/core": "^3.2.4",
-    "@stryker-mutator/jest-runner": "^3.2.4",
-    "@stryker-mutator/typescript": "^3.2.4",
     "@types/apicache": "^1.2.2",
     "@types/compression": "^1.7.0",
     "@types/cors": "^2.8.8",
