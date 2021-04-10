@@ -7,21 +7,6 @@ import {
   MissingTokenError
 } from '../types/errors.type'
 
-interface ArgsInterface {
-  (
-    err: Error,
-    req: Request,
-    res: Response<BodyOutput>,
-    next: NextFunction
-  ): OutputErrors
-}
-
-type OutputErrors = Response<BodyOutput> | undefined
-
-interface BodyOutput {
-  errors: ErrorItem[] | ValidationErrorItem[]
-}
-
 interface ErrorItem {
   code: string
   message: string
@@ -30,6 +15,21 @@ interface ErrorItem {
 interface ValidationErrorItem extends ErrorItem {
   location: 'body' | 'cookies' | 'headers' | 'params' | 'query' | undefined
   param: string
+}
+
+interface BodyOutput {
+  errors: ErrorItem[] | ValidationErrorItem[]
+}
+
+type OutputErrors = Response<BodyOutput> | undefined
+
+interface ArgsInterface {
+  (
+    err: Error,
+    req: Request,
+    res: Response<BodyOutput>,
+    next: NextFunction
+  ): OutputErrors
 }
 
 const validationErrorHandler: ArgsInterface = (err, _, res, next) => {
@@ -93,7 +93,7 @@ const errorHandlerWrapper = (app: Express): Express => {
   app.use(semanticErrorHandler)
   app.use(notFoundErrorHandler)
 
-  app.use((err: Error, _: Request, res: Response, next:NextFunction) => {
+  app.use((err: Error, _: Request, res: Response, next: NextFunction) => {
     console.error(err)
 
     return res.status(500).json({
