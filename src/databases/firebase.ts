@@ -5,8 +5,7 @@ import { Database, Challenge, Solves, Team } from '../app'
 import { firebaseConfig } from '../../constants.json'
 import {
   SemanticError,
-  NotFoundError,
-  AuthorizationError
+  NotFoundError
 } from '../types/errors.type'
 import { createSHA256, getUserDataFromJWT } from '../utils'
 
@@ -114,29 +113,6 @@ const prepareDatabase = (
     }
   },
   users: {
-    get: async (id: string) => {
-      // const data = await firestore.collection('users').doc(id)
-      return { id }
-    },
-    register: async ({ email, password, displayName }) => {
-      try {
-        const userCredentials = await auth.createUserWithEmailAndPassword(
-          email,
-          password
-        )
-
-        if (!userCredentials.user) {
-          throw new Error('Empty user')
-        }
-
-        await userCredentials.user.updateProfile({ displayName })
-        await userCredentials.user.sendEmailVerification()
-
-        return { uid: userCredentials.user.uid, email, displayName }
-      } catch (err) {
-        throw new (resolveFirebaseError(err))(err.message)
-      }
-    },
     current: async token => {
       try {
         const { uid } = await getUserDataFromJWT(token)
@@ -181,32 +157,6 @@ const prepareDatabase = (
           }
         }
       } catch (err) {
-        throw new (resolveFirebaseError(err))(err.message)
-      }
-    },
-    login: async ({ email, password }) => {
-      try {
-        const { user } = await auth.signInWithEmailAndPassword(email, password)
-
-        if (!user) {
-          throw new NotFoundError("Users don't exists")
-        }
-
-        if (!user.emailVerified) {
-          throw new AuthorizationError('Email not verified')
-        }
-
-        const token = await user.getIdToken()
-        const data = {
-          uid: user.uid,
-          email: user.email || email,
-          displayName: user.displayName || ''
-        }
-        return { user: data, token, refreshToken: user.refreshToken }
-      } catch (err) {
-        if (err instanceof AuthorizationError || err instanceof NotFoundError) {
-          throw err
-        }
         throw new (resolveFirebaseError(err))(err.message)
       }
     }
@@ -327,7 +277,7 @@ export function init ({
   databaseURL: string
 }): Database {
   const firebaseAdminInstance = admin.initializeApp({
-    credential: admin.credential.cert(JSON.stringify(credential)),
+    credential: admin.credential.cert(credential),
     databaseURL
   })
   const authAdmin = firebaseAdminInstance.auth()

@@ -8,11 +8,6 @@ import routes from './routes'
 import errorHandler from './middlewares/error.middleware'
 import { APP_ENV } from './config'
 
-export interface AppInterface {
-  port?: number
-  database: Database
-}
-
 export interface Team {
   id: string
   name: string
@@ -40,30 +35,9 @@ export interface Database {
     list: () => Promise<Array<Omit<Team, 'members'>>>
   }
   users: {
-    register: ({
-      email,
-      password,
-      displayName
-    }: {
-      email: string
-      password: string
-      displayName: string
-    }) => Promise<{ uid: string; email: string; displayName: string }>
-    get: (id: string) => Promise<{ id: string }>
     current: (
       uid: string
-    ) => Promise<{ uid: string; email: string; displayName: string, team?: Omit<Team, 'members'> }>
-    login: ({
-      email,
-      password
-    }: {
-      email: string
-      password: string
-    }) => Promise<{
-      user: { uid: string; email: string; displayName: string }
-      token: string
-      refreshToken: string
-    }>
+    ) => Promise<{ uid: string; team?: Omit<Team, 'members'> }>
   }
   solves: {
     all: () => Promise<{ [teamId: string]: Solves }>
@@ -74,6 +48,11 @@ export interface Database {
     all: () => Promise<{ [challengeId: string]: Challenge }>
     get: (id: string) => Promise<Challenge>
   }
+}
+
+export interface AppInterface {
+  port?: number
+  database: Database
 }
 
 export default function App (args: AppInterface): Express {
