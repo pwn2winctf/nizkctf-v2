@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid'
 import jwt from 'jsonwebtoken'
 import { createHash } from 'crypto'
 import libsodium from 'libsodium-wrappers'
@@ -79,47 +78,13 @@ export function prepareDatabase (store: DatabaseStructure): Database {
   }
 
   const users: Database['users'] = {
-    register: async ({ email, password, displayName }) => {
-      if (Object.values(store.users).some(user => user.email === email)) {
-        throw new SemanticError('Already exists a user with this email')
-      }
-
-      const uuid = uuidv4()
-      store.users[uuid] = { email, password, displayName }
-
-      return { uid: uuid, email, displayName }
-    },
     current: async token => {
       const userData = store.users[token]
       if (!userData) {
         throw new NotFoundError('User not found')
       }
       return { uid: token, ...userData }
-    },
-    login: async ({ email, password }) => {
-      const userEntries = Object.entries(store.users).find(
-        item => item[1].email === email
-      )
-      if (!userEntries) {
-        throw new NotFoundError('Not exists a user with this email')
-      }
-
-      if (userEntries[1].password !== password) {
-        throw new SemanticError('Wrong password')
-      }
-
-      const uuid = userEntries[0]
-      const { displayName } = userEntries[1]
-
-      const token = createJWTToken({ userId: uuid, email, displayName: displayName, verified: true })
-
-      return {
-        user: { uid: uuid, email, displayName },
-        token: token,
-        refreshToken: uuid
-      }
-    },
-    get: (id: string) => Promise.resolve({ id })
+    }
   }
 
   const solves: Database['solves'] = {
