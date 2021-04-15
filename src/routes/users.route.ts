@@ -19,9 +19,9 @@ export default function users (database: Database): Router {
           throw new Error('Authorization is required')
         }
         const token: string = req.headers.authorization
-        await validateToken(token)
+        const { uid } = await validateToken(token)
 
-        const data = await database.users.current(token)
+        const data = await database.users.current(uid)
         res.status(200).send(data)
       } catch (err) {
         next(err)
