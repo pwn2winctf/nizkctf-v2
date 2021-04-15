@@ -29,6 +29,11 @@ export interface DatabaseStructure {
       password: string
     }
   }
+  usersInfo: {
+    [uid: string]: {
+      shareInfo: boolean
+    }
+  }
   solves: {
     [key: string]: {
       [key: string]: number
@@ -84,6 +89,9 @@ export function prepareDatabase (store: DatabaseStructure): Database {
         throw new NotFoundError('User not found')
       }
       return { uid: token, ...userData }
+    },
+    register: async ({ uid, shareInfo }) => {
+      store.usersInfo[uid] = { shareInfo }
     }
   }
 
