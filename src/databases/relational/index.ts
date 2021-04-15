@@ -14,6 +14,7 @@ declare module 'knex/types/tables' {
   }
   interface User {
     id: string,
+    shareInfo: boolean,
     teamId?: Team['id'],
   }
   interface Countries {
