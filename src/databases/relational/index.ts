@@ -58,11 +58,13 @@ const teams: Database['teams'] = {
       await db.transaction(async transaction => {
         await transaction.insert({ id, name }).into('teams')
 
-        const countriesId = await transaction.select('*').from('countries').whereIn('name', countries)
-        if (countriesId.length === 0) {
-          throw new SemanticError('Invalid country')
+        if (countries.length > 0) {
+          const countriesId = await transaction.select('*').from('countries').whereIn('name', countries)
+          if (countriesId.length === 0) {
+            throw new SemanticError('Invalid country')
+          }
+          await transaction.insert(countriesId.map(country => ({ teamId: id, countryId: country.id }))).into('teamCountries')
         }
-        await transaction.insert(countriesId.map(country => ({ teamId: id, countryId: country.id }))).into('teamCountries')
 
         await transaction.insert({ id: members[0], teamId: id }).into('users')
       })
@@ -77,7 +79,7 @@ const teams: Database['teams'] = {
         } else if (err.message === 'Invalid Country') {
           throw new SemanticError(err.message)
         } else {
-          throw new SemanticError('Invalid flag')
+          throw new SemanticError('Invalid country')
         }
       } else {
         throw new Error(err)
