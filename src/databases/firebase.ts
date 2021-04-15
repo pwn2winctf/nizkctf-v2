@@ -159,6 +159,12 @@ const prepareDatabase = (
       } catch (err) {
         throw new (resolveFirebaseError(err))(err.message)
       }
+    },
+    register: async ({ shareInfo, uid }) => {
+      await firestore
+        .collection('users')
+        .doc(uid)
+        .set({ shareInfo })
     }
   },
   challenges: {
