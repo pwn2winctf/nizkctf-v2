@@ -38,6 +38,7 @@ export interface Database {
     current: (
       uid: string
     ) => Promise<{ uid: string; team?: Omit<Team, 'members'> }>
+    register: ({ uid, shareInfo }: { uid: string, shareInfo: boolean }) => Promise<void>
   }
   solves: {
     all: () => Promise<{ [teamId: string]: Solves }>

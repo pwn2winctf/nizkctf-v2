@@ -67,15 +67,24 @@ const teams: Database['teams'] = {
           await transaction.insert(countriesId.map(country => ({ teamId: id, countryId: country.id }))).into('teamCountries')
         }
 
-        await transaction.insert({ id: members[0], teamId: id }).into('users')
+        const user = await transaction.select('*').where({ id: members[0] }).into('users').first()
+        if (!user) {
+          await transaction.insert({ id: members[0], teamId: id }).into('users')
+        } else {
+          if (user.teamId) {
+            throw new SemanticError('you are already member of a team')
+          } else {
+            await transaction.update({ teamId: id }).where({ id: members[0] }).from('users')
+          }
+        }
       })
 
       return { id, name, countries, members }
     } catch (err) {
-      if (err instanceof Error) {
-        if (err.message.includes('UNIQUE constraint failed: users.id')) {
-          throw new SemanticError('you are already member of a team')
-        } else if (err.message.includes('UNIQUE constraint failed: teams.name')) {
+      if (err instanceof SemanticError) {
+        throw new SemanticError(err.message)
+      } else if (err instanceof Error) {
+        if (err.message.includes('UNIQUE constraint failed: teams.name')) {
           throw new SemanticError('Already exists this team')
         } else if (err.message === 'Invalid Country') {
           throw new SemanticError(err.message)
@@ -171,6 +180,9 @@ const users: Database['users'] = {
       }
     }
     return data
+  },
+  register: async ({ uid, shareInfo }) => {
+    await db.insert({ id: uid, shareInfo }).into('users')
   }
 }
 
