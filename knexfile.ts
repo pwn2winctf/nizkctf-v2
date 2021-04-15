@@ -3,11 +3,26 @@ import path from 'path'
 import { DATABASE_URL } from './src/config'
 
 const stages = {
-
   development: {
     client: 'sqlite3',
     connection: {
       filename: './dev.sqlite3'
+    },
+    useNullAsDefault: true,
+    migrations: {
+      tableName: 'knex_migrations',
+      directory: path.resolve(__dirname, 'src', 'databases', 'relational', 'migrations'),
+      loadExtensions: ['.ts']
+    },
+    seeds: {
+      directory: path.resolve(__dirname, 'src', 'databases', 'relational', 'seeds'),
+      loadExtensions: ['.ts']
+    }
+  },
+  test: {
+    client: 'sqlite3',
+    connection: {
+      filename: './test.sqlite3'
     },
     useNullAsDefault: true,
     migrations: {
