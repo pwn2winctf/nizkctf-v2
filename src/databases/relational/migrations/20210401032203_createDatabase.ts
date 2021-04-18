@@ -29,6 +29,7 @@ export async function up (knex: Knex): Promise<void> {
     .createTable('solves', table => {
       table.text('challengeId').notNullable().references('id').inTable('challenges').onDelete('CASCADE')
       table.text('teamId').notNullable().references('id').inTable('teams').onDelete('CASCADE')
+      table.text('flag').notNullable()
       table.timestamp('moment').notNullable()
 
       table.unique(['challengeId', 'teamId'])
