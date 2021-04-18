@@ -1,8 +1,6 @@
 import admin, { FirebaseError } from 'firebase-admin'
-import firebase from 'firebase'
 
 import { Database, Challenge, Solves, Team } from '../app'
-import { firebaseConfig } from '../../constants.json'
 import {
   SemanticError,
   NotFoundError
@@ -29,8 +27,7 @@ const resolveFirebaseError = (err: FirebaseError) => {
 
 const prepareDatabase = (
   firestore: admin.firestore.Firestore,
-  authAdmin: admin.auth.Auth,
-  auth: firebase.auth.Auth
+  authAdmin: admin.auth.Auth
 ): Database => ({
   teams: {
     register: async ({ name, countries, members }) => {
@@ -219,7 +216,7 @@ const prepareDatabase = (
       const getSolves = async () =>
         (await firestore.collection('solves').get()).docs.reduce(
           (obj: { [teamId: string]: Solves }, doc) => {
-            obj[doc.id] = doc.data()
+            obj[doc.id] = doc.data().timestamp
             return obj
           },
           {}
@@ -231,14 +228,14 @@ const prepareDatabase = (
         throw new (resolveFirebaseError(err))(err.message)
       }
     },
-    register: async (teamId, challengeId) => {
+    register: async (teamId, challengeId, flag) => {
       try {
         const timestamp = new Date().getTime()
 
         await firestore
           .collection('solves')
           .doc(teamId)
-          .set({ [challengeId]: timestamp })
+          .set({ [challengeId]: { timestamp, flag } })
 
         return { [challengeId]: timestamp }
       } catch (err) {
@@ -289,8 +286,6 @@ export function init ({
   const authAdmin = firebaseAdminInstance.auth()
   const firestore = firebaseAdminInstance.firestore()
 
-  const firebaseInstance = firebase.initializeApp(firebaseConfig)
-  const auth = firebaseInstance.auth()
-  const database = prepareDatabase(firestore, authAdmin, auth)
+  const database = prepareDatabase(firestore, authAdmin)
   return database
 }

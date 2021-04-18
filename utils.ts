@@ -36,7 +36,7 @@ export interface DatabaseStructure {
   }
   solves: {
     [key: string]: {
-      [key: string]: number
+      [key: string]: { timestamp: number, flag: string }
     }
   }
   challenges: {
@@ -99,7 +99,11 @@ export function prepareDatabase (store: DatabaseStructure): Database {
     all: async () => {
       const solves = Object.entries(store.solves).reduce(
         (obj: { [teamId: string]: Solves }, [teamId, challenges]) => {
-          const teamSolves: Solves = { ...challenges }
+          const teamSolves: Solves = Object.entries(challenges).reduce((obj: { [challengeId: string]: number }, [challengeId, { timestamp }]) => {
+            obj[challengeId] = timestamp
+
+            return obj
+          }, {})
           obj[teamId] = teamSolves
 
           return obj
@@ -108,7 +112,7 @@ export function prepareDatabase (store: DatabaseStructure): Database {
       )
       return solves
     },
-    register: async (teamId, challengeId) => {
+    register: async (teamId, challengeId, flag) => {
       const team = store.teams[teamId]
       if (!team) {
         throw new NotFoundError('Team not found')
@@ -123,12 +127,18 @@ export function prepareDatabase (store: DatabaseStructure): Database {
 
       store.solves[teamId] = {
         ...previousData,
-        [challengeId]: new Date().getTime()
+        [challengeId]: { timestamp: new Date().getTime(), flag }
       }
-      return store.solves[teamId]
+      return Object.entries(store.solves[teamId]).reduce((obj: { [challengeId: string]: number }, [challengeId, { timestamp }]) => {
+        obj[challengeId] = timestamp
+        return obj
+      }, {})
     },
     get: async teamId => {
-      return store.solves[teamId]
+      return Object.entries(store.solves[teamId]).reduce((obj: { [challengeId: string]: number }, [challengeId, { timestamp }]) => {
+        obj[challengeId] = timestamp
+        return obj
+      }, {})
     }
   }
   const challenges: Database['challenges'] = {

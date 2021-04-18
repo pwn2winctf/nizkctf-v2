@@ -37,7 +37,8 @@ declare module 'knex/types/tables' {
   interface Solve {
     challengeId: Challenge['id'],
     teamId: Team['id'],
-    moment: number
+    moment: number,
+    flag: string
   }
 
   interface Tables {
@@ -99,7 +100,7 @@ const teams: Database['teams'] = {
   get: async (id: string): Promise<ITeam> => {
     const teamData = await db.select('teams.name').from('teams').where({ id }).first()
     if (!teamData) {
-      throw new NotFoundError('Not found')
+      throw new NotFoundError('Team not found')
     }
 
     const members = (await db.select('id').from('users').where('teamId', '=', id)).map(row => row.id)
@@ -199,7 +200,7 @@ const challenges: Database['challenges'] = {
     const challenge = await db.select('*').from('challenges').where({ id }).first()
 
     if (!challenge) {
-      throw new NotFoundError('Not found')
+      throw new NotFoundError('Challenge not found')
     }
 
     return challenge
@@ -220,10 +221,10 @@ const solves: Database['solves'] = {
       return obj
     }, {})
   },
-  register: async (teamId, challengeId) => {
+  register: async (teamId, challengeId, flag) => {
     try {
       const timestamp = new Date().getTime()
-      await db.insert({ teamId, challengeId, moment: timestamp }).into('solves')
+      await db.insert({ teamId, challengeId, moment: timestamp, flag }).into('solves')
       return { challengeId: timestamp }
     } catch (err) {
       if (err instanceof Error) {

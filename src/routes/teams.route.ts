@@ -85,7 +85,7 @@ export default function teams (database: Database): Router {
           throw new SemanticError('Invalid proof')
         }
 
-        const data = await database.solves.register(teamId, challengeId)
+        const data = await database.solves.register(teamId, challengeId, req.body.proof)
         res.status(200).send(data)
       } catch (err) {
         if (err instanceof TypeError && err.message.includes('is too short')) {
