@@ -25,9 +25,9 @@ export const getChallengeInfo = async (challengeId: string): Promise<Challenge> 
 
   const fetchMetadata: { description: string, title: string, tags: string[], salt: string, pk: string, id: string, opslimit: number, memlimit: number } = await fetch(urlChallengeJSON).then(response => response.json())
 
-  const { description, title, tags, ...otherData } = fetchMetadata
+  const { salt, title, pk, id, opslimit, memlimit } = fetchMetadata
 
-  return { name: title, ...otherData }
+  return { name: title, salt, pk, id, opslimit, memlimit }
 }
 
 export async function seed (knex: Knex): Promise<void> {
