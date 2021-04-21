@@ -6,6 +6,7 @@ import knexfile from '../../../knexfile'
 import { NotFoundError, SemanticError } from '../../types/errors.type'
 import { Countries, Team, User } from 'knex/types/tables'
 import { createSHA256 } from '../../utils'
+import { APP_ENV } from '../../config'
 
 declare module 'knex/types/tables' {
   interface Team {
@@ -51,7 +52,7 @@ declare module 'knex/types/tables' {
   }
 }
 
-const db = knex(knexfile.development)
+const db = knex(knexfile[APP_ENV])
 
 const teams: Database['teams'] = {
   register: async ({ name, countries, members }): Promise<ITeam> => {
