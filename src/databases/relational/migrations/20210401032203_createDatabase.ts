@@ -12,7 +12,7 @@ export async function up (knex: Knex): Promise<void> {
     .createTable('teamCountries', table => {
       table.increments('id')
       table.text('teamId').references('teams.id').notNullable().onDelete('CASCADE')
-      table.text('countryId').references('countries.id').notNullable().onDelete('CASCADE')
+      table.integer('countryId').references('countries.id').notNullable().onDelete('CASCADE')
     })
     .createTable('users', table => {
       table.text('id').primary()
