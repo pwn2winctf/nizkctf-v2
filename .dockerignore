@@ -1,0 +1,13 @@
+.env*
+__tests__
+dist
+reports
+.nvmrc
+dev.sqlite3
+Procfile
+.eslint*
+jest.config.js
+README.md
+utils.ts
+node_modules
+Dockerfile
