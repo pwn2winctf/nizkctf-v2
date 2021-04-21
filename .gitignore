@@ -89,12 +89,15 @@ typings/
 .dynamodb/
 
 # End of https://www.toptal.com/developers/gitignore/api/node
-dist/
 
-.env.local
 # stryker temp files
 .stryker-tmp
 reports/
 
 ### NVM ###
 .nvmrc
+
+### CUSTOM ###
+dev.sqlite3
+dist/
+.env.*
