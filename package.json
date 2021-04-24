@@ -18,7 +18,9 @@
     "test:watch": "jest --watch --runInBand --detectOpenHandles",
     "knex:migrate": "knex --knexfile knexfile.ts migrate:latest",
     "lint": "eslint . --ext .ts,.json,.js,.md",
-    "lint:fix": "eslint . --ext .ts,.json,.js,.md --fix"
+    "lint:fix": "eslint . --ext .ts,.json,.js,.md --fix",
+    "gcp-build": "tsc",
+    "deploy": "gcloud app deploy"
   },
   "lint-staged": {
     "*.+(ts|js|json|md)": [
