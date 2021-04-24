@@ -101,3 +101,4 @@ reports/
 dev.sqlite3
 dist/
 .env.*
+env_variables.yml
