@@ -26,5 +26,5 @@ Procfile
 .eslint*
 jest.config.js
 README.md
-utils.ts
+./utils.ts
 Dockerfile
