@@ -28,7 +28,11 @@ export default function teams (database: Database): Router {
 
         const token: string = req.headers.authorization
 
-        const { uid } = await validateToken(token)
+        const { uid, verified } = await validateToken(token)
+
+        if (!verified) {
+          throw new SemanticError('E-mail not verified!')
+        }
 
         const name: string = req.body.name
         const countries: string[] = req.body.countries
