@@ -1,6 +1,9 @@
 // Update with your config settings.
 import path from 'path'
-import { DATABASE_URL } from './src/config'
+import { DATABASE_PASSWORD, DATABASE_HOST, DATABASE_USER, APP_ENV } from './src/config'
+
+const dbSocketPath = process.env.DB_SOCKET_PATH || '/cloudsql'
+const host = APP_ENV === 'production' ? `${dbSocketPath}/${DATABASE_HOST}` : DATABASE_HOST
 
 const stages = {
   development: {
@@ -37,7 +40,11 @@ const stages = {
   },
   production: {
     client: 'postgresql',
-    connection: DATABASE_URL,
+    connection: {
+      user: DATABASE_USER,
+      password: DATABASE_PASSWORD,
+      host: host
+    },
     pool: {
       min: 2,
       max: 10
