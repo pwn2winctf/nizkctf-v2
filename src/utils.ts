@@ -1,5 +1,6 @@
 import { createHash } from 'crypto'
 import jwt from 'jsonwebtoken'
+import dayjs from 'dayjs'
 
 import { dynamic_scoring as dynamicScore } from '../constants.json'
 import { MissingTokenError } from './types/errors.type'
@@ -29,3 +30,7 @@ export async function getUserDataFromJWT (token: string): Promise<{ uid: string,
     throw new MissingTokenError('Invalid token')
   }
 }
+
+export const START_SUBSCRIPTION_DATE = dayjs('02-05-2021 -03:00', 'DD-MM-YYYY Z').toDate()
+export const START_EVENT_DATE = dayjs('28-05-2021 13:37 -03:00', 'DD-MM-YYYY HH:mm Z').toDate()
+export const END_EVENT_DATE = dayjs('30-05-2021 13:37 -03:00', 'DD-MM-YYYY HH:mm Z').toDate()

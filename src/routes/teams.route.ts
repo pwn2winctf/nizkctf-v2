@@ -1,5 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express'
 import { createHash } from 'crypto'
+import dayjs from 'dayjs'
+import isBetween from 'dayjs/plugin/isBetween'
 
 import { Database } from '../app'
 import { cryptoSignOpen } from '../libsodium'
@@ -14,6 +16,9 @@ import { newSolveScheme, newTeamScheme } from '../schemes/teams.scheme'
 import validate from '../middlewares/validation.middleware'
 import recaptchaMiddleware from '../middlewares/recaptcha.middleware'
 import { validateToken } from '../authorization'
+import { END_EVENT_DATE, START_EVENT_DATE, START_SUBSCRIPTION_DATE } from '../utils'
+
+dayjs.extend(isBetween)
 
 export default function teams (database: Database): Router {
   const router = Router()
@@ -32,6 +37,10 @@ export default function teams (database: Database): Router {
 
         if (!verified) {
           throw new SemanticError('E-mail not verified!')
+        }
+
+        if (dayjs(START_SUBSCRIPTION_DATE).isAfter(dayjs())) {
+          throw new SemanticError('Subscriptions not enabled!')
         }
 
         const name: string = req.body.name
@@ -59,6 +68,10 @@ export default function teams (database: Database): Router {
         const token = req.headers.authorization
 
         const { uid } = await validateToken(token)
+
+        if (!dayjs().isBetween(START_EVENT_DATE, END_EVENT_DATE)) {
+          throw new SemanticError('Submissions not allowed!')
+        }
 
         const teamId: string = req.params.teamId
         const challengeId: string = req.body.challengeId
