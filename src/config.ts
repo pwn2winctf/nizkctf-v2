@@ -12,3 +12,5 @@ export const DATABASE_URL = process.env.DATABASE_URL || ''
 export const DATABASE_HOST = process.env.DATABASE_HOST || ''
 export const DATABASE_USER = process.env.DATABASE_USER || ''
 export const DATABASE_PASSWORD = process.env.DATABASE_PASSWORD || ''
+
+export const SENTRY_DSN = 'https://b8c6bd61d8a44647a67205bf3138b8a6@o374062.ingest.sentry.io/5744526'
