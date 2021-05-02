@@ -1,3 +1,5 @@
 runtime: nodejs12
+automatic_scaling:
+  max_instances: 100
 includes:
   - env_variables.yaml
