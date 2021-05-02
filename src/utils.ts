@@ -31,6 +31,6 @@ export async function getUserDataFromJWT (token: string): Promise<{ uid: string,
   }
 }
 
-export const START_SUBSCRIPTION_DATE = dayjs('02-05-2021 -03:00', 'DD-MM-YYYY Z').toDate()
+export const START_SUBSCRIPTION_DATE = dayjs('02-05-2021 08:00 -03:00', 'DD-MM-YYYY HH:mm Z').toDate()
 export const START_EVENT_DATE = dayjs('28-05-2021 13:37 -03:00', 'DD-MM-YYYY HH:mm Z').toDate()
 export const END_EVENT_DATE = dayjs('30-05-2021 13:37 -03:00', 'DD-MM-YYYY HH:mm Z').toDate()
