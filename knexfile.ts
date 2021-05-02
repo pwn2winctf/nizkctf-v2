@@ -1,9 +1,9 @@
 // Update with your config settings.
 import path from 'path'
-import { DATABASE_PASSWORD, DATABASE_HOST, DATABASE_USER, APP_ENV } from './src/config'
+import { DATABASE_PASSWORD, DATABASE_HOST, DATABASE_USER } from './src/config'
 
-const dbSocketPath = process.env.DB_SOCKET_PATH || '/cloudsql'
-const host = APP_ENV === 'production' ? `${dbSocketPath}/${DATABASE_HOST}` : DATABASE_HOST
+const dbSocketPath = process.env.DB_SOCKET_PATH
+const host = dbSocketPath ? `${dbSocketPath}/${DATABASE_HOST}` : DATABASE_HOST
 
 const stages = {
   development: {
