@@ -4,7 +4,7 @@ import { Knex } from 'knex'
 import { Challenge } from '../../../app'
 import { APP_ENV } from '../../../config'
 
-const CHALLENGES_BASE_URL = APP_ENV === 'production' ? 'https://ctf-br.github.io/ranking/challenges' : 'https://ctf-br.github.io/ranking/challenges'
+const CHALLENGES_BASE_URL = APP_ENV === 'production' ? 'https://pwn2winctf.github.io/nizkctf-content/challenges' : 'https://ctf-br.github.io/ranking/challenges'
 
 export const getChallenges = async (): Promise<Challenge[]> => {
   const challengesId: string[] = await getChallengesId()
