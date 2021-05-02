@@ -17,6 +17,7 @@ import validate from '../middlewares/validation.middleware'
 import recaptchaMiddleware from '../middlewares/recaptcha.middleware'
 import { validateToken } from '../authorization'
 import { END_EVENT_DATE, START_EVENT_DATE, START_SUBSCRIPTION_DATE } from '../utils'
+import { getCache, updateCache } from '../cache'
 
 dayjs.extend(isBetween)
 
@@ -117,10 +118,18 @@ export default function teams (database: Database): Router {
   router.get(
     '/', async (req: Request, res: Response, next: NextFunction) => {
       try {
+        const cachedData = getCache(req)
+        if (cachedData) {
+          res.setHeader('Cache-Control', 'max-age=5, s-maxage=15, stale-while-revalidate, public')
+          return res.status(200).send(cachedData)
+        }
+
         const data = await database.teams.list()
 
+        updateCache(5, data, req)
+
         res.setHeader('Cache-Control', 'max-age=5, s-maxage=15, stale-while-revalidate, public')
-        res.status(200).send(data)
+        return res.status(200).send(data)
       } catch (err) {
         next(err)
       }

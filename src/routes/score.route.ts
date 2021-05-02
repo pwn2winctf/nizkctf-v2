@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express'
 
 import { Database } from '../app'
+import { getCache, updateCache } from '../cache'
 import { computeScore } from '../utils'
 
 interface TaskStat {
@@ -26,8 +27,14 @@ interface Score {
 export default function score (database: Database): Router {
   const router = Router()
 
-  router.get('/', async (_: Request, res: Response, next: NextFunction) => {
+  router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const cachedData = getCache(req)
+      if (cachedData) {
+        res.setHeader('Cache-Control', 'max-age=5, s-maxage=15, stale-while-revalidate, public')
+        return res.status(200).send(cachedData)
+      }
+
       const challenges = await database.challenges.all()
       const solves = await database.solves.all()
 
@@ -88,9 +95,10 @@ export default function score (database: Database): Router {
 
       const score: Score = { tasks, standings } as Score
 
-      res.setHeader('Cache-Control', 'max-age=5, s-maxage=15, stale-while-revalidate, public')
+      updateCache(5, score, req)
 
-      res.status(200).json(score)
+      res.setHeader('Cache-Control', 'max-age=5, s-maxage=15, stale-while-revalidate, public')
+      return res.status(200).json(score)
     } catch (err) {
       next(err)
     }
