@@ -48,7 +48,7 @@ const prepareDatabase = (
         const teamData = (await firestore.collection('teams').doc(teamId).get()).data()
 
         if (teamData) {
-          throw new SemanticError('Already exists this team')
+          throw new SemanticError('This team already exists')
         }
 
         await firestore

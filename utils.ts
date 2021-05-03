@@ -61,7 +61,7 @@ export function prepareDatabase (store: DatabaseStructure): Database {
         .update(name)
         .digest('hex')
       if (store.teams[id]) {
-        throw new SemanticError('Already exists this team')
+        throw new SemanticError('This team already exists')
       }
       store.teams[id] = { name, countries, members }
       return { id, name, countries, members }

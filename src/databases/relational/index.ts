@@ -87,7 +87,7 @@ const teams: Database['teams'] = {
         throw new SemanticError(err.message)
       } else if (err instanceof Error) {
         if (err.message.includes('UNIQUE constraint failed: teams.name') || err.message.includes('duplicate key value violates unique constraint "teams_pkey"')) {
-          throw new SemanticError('Already exists this team')
+          throw new SemanticError('This team already exists')
         } else if (err.message === 'Invalid Country') {
           throw new SemanticError(err.message)
         } else {

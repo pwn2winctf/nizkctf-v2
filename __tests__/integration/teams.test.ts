@@ -107,7 +107,7 @@ describe('Teams endpoints', () => {
     expect(status).toBe(422)
     expect(firstError).not.toEqual(undefined)
     expect(firstError.code).toBe('semantic')
-    expect(firstError.message).toBe('Already exists this team')
+    expect(firstError.message).toBe('This team already exists')
   })
 
   it('Should not create team without token', async () => {
