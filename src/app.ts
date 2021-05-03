@@ -44,6 +44,7 @@ export interface Database {
   }
   solves: {
     all: () => Promise<{ [teamId: string]: Solves }>
+    allWithFlag: () => Promise<Array<{ teamId: string, challengeId: string, flag: string, moment: number }>>
     get: (teamId: string) => Promise<Solves>
     register: (teamId: string, challengeId: string, flag: string) => Promise<Solves>
   }

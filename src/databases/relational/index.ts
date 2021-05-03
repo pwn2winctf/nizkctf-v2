@@ -245,6 +245,10 @@ const solves: Database['solves'] = {
       obj[challengeId] = moment
       return obj
     }, {})
+  },
+  allWithFlag: async () => {
+    const solves = await db.select('*').from('solves')
+    return solves
   }
 }
 

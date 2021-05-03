@@ -228,6 +228,29 @@ const prepareDatabase = (
         throw new (resolveFirebaseError(err))(err.message)
       }
     },
+    allWithFlag: async () => {
+      const getSolves = async () => {
+        const solves: Array<{ teamId: string, moment: number, flag: string, challengeId: string }> = []
+
+        const docs = await firestore.collection('solves').get()
+
+        docs.forEach(doc => {
+          const items = Object.entries(doc.data())
+
+          items.forEach(([id, item]) => {
+            solves.push({ teamId: doc.id, moment: item.timestamp, flag: item.flag, challengeId: id })
+          })
+        })
+
+        return solves
+      }
+
+      try {
+        return await getSolves()
+      } catch (err) {
+        throw new (resolveFirebaseError(err))(err.message)
+      }
+    },
     register: async (teamId, challengeId, flag) => {
       try {
         const timestamp = new Date().getTime()

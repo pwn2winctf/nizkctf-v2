@@ -112,6 +112,17 @@ export function prepareDatabase (store: DatabaseStructure): Database {
       )
       return solves
     },
+    allWithFlag: async () => {
+      const solves: Array<{ teamId:string, challengeId:string, moment:number, flag:string }> = []
+
+      Object.entries(store.solves).forEach(([teamId, challenges]) => {
+        Object.entries(challenges).forEach(([challengeId, { timestamp, flag }]) => {
+          solves.push({ teamId, challengeId, moment: timestamp, flag })
+        })
+      })
+
+      return solves
+    },
     register: async (teamId, challengeId, flag) => {
       const team = store.teams[teamId]
       if (!team) {
