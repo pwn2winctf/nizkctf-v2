@@ -62,11 +62,12 @@ const teams: Database['teams'] = {
         await transaction.insert({ id, name }).into('teams')
 
         if (countries.length > 0) {
-          const countriesId = await transaction.select('*').from('countries').whereIn('name', countries)
-          if (countriesId.length === 0) {
+          const countriesIdList = await transaction.select('*').from('countries').whereIn('name', countries)
+          if (countriesIdList.length === 0) {
             throw new SemanticError('Invalid country')
           }
-          await transaction.insert(countriesId.map(country => ({ teamId: id, countryId: country.id }))).into('teamCountries')
+          const countriesId = new Map(countriesIdList.map(country => [country.name, country.id]))
+          await transaction.insert(countries.map(country => ({ teamId: id, countryId: countriesId.get(country) }))).into('teamCountries')
         }
 
         const user = await transaction.select('*').where({ id: members[0] }).into('users').first()
