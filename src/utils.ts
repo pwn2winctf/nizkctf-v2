@@ -1,9 +1,12 @@
 import { createHash } from 'crypto'
 import jwt from 'jsonwebtoken'
 import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 
 import { dynamic_scoring as dynamicScore } from '../constants.json'
 import { MissingTokenError } from './types/errors.type'
+
+dayjs.extend(customParseFormat)
 
 export function computeScore (numberOfSolves: number): number {
   const { K, V, minpts, maxpts } = dynamicScore
