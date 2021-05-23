@@ -33,7 +33,5 @@ export const getChallengeInfo = async (challengeId: string): Promise<Challenge> 
 export async function seed (knex: Knex): Promise<void> {
   const challenges = await getChallenges()
 
-  await knex('challenges').del()
-
-  await knex('challenges').insert(challenges)
+  await knex('challenges').insert(challenges).onConflict('id').merge()
 }
