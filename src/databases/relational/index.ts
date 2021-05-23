@@ -38,7 +38,7 @@ declare module 'knex/types/tables' {
   interface Solve {
     challengeId: Challenge['id'],
     teamId: Team['id'],
-    moment: number,
+    moment: Date,
     flag: string
   }
 
@@ -215,9 +215,9 @@ const solves: Database['solves'] = {
 
     return solves.reduce((obj: { [teamId: string]: { [key: string]: number } }, item) => {
       if (obj[item.teamId]) {
-        obj[item.teamId][item.challengeId] = item.moment
+        obj[item.teamId][item.challengeId] = item.moment.getTime()
       } else {
-        obj[item.teamId] = { [item.challengeId]: item.moment }
+        obj[item.teamId] = { [item.challengeId]: item.moment.getTime() }
       }
 
       return obj
@@ -225,9 +225,9 @@ const solves: Database['solves'] = {
   },
   register: async (teamId, challengeId, flag) => {
     try {
-      const timestamp = new Date().getTime()
+      const timestamp = new Date()
       await db.insert({ teamId, challengeId, moment: timestamp, flag }).into('solves')
-      return { challengeId: timestamp }
+      return { challengeId: timestamp.getTime() }
     } catch (err) {
       if (err instanceof Error) {
         if (err.message.includes('UNIQUE constraint failed: solves.challengeId, solves.teamId')) {
@@ -243,13 +243,13 @@ const solves: Database['solves'] = {
   get: async (id: string) => {
     const solves = await db.select('*').from('solves').where({ teamId: id })
     return solves.reduce((obj: { [challengeId: string]: number }, { challengeId, moment }) => {
-      obj[challengeId] = moment
+      obj[challengeId] = moment.getTime()
       return obj
     }, {})
   },
   allWithFlag: async () => {
     const solves = await db.select('*').from('solves')
-    return solves
+    return solves.map(solve => ({ ...solve, moment: solve.moment.getTime() }))
   }
 }
 
