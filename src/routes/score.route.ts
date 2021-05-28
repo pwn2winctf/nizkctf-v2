@@ -83,10 +83,13 @@ export default function score (database: Database): Router {
         })
       )
 
-      temporaryStandings.sort(
-        (teamA, teamB) =>
-          teamB.score - teamA.score
-      )
+      temporaryStandings.sort((teamA, teamB) => {
+        if (teamB.score === teamA.score) {
+          return teamA.lastAccept - teamB.lastAccept
+        } else {
+          return teamB.score - teamA.score
+        }
+      })
 
       const standings: Standing[] = temporaryStandings.map((item, index) => ({
         ...item,
