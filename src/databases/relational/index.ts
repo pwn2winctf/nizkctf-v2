@@ -82,8 +82,6 @@ const teams: Database['teams'] = {
             await transaction.update({ teamId: id }).where({ id: members[0] }).from('users')
           }
         }
-
-        await transaction.commit()
       })
 
       return { id, name, countries, members }
