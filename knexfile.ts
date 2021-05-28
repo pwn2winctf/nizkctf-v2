@@ -47,7 +47,7 @@ const stages = {
     },
     pool: {
       min: 2,
-      max: 10
+      max: 50
     },
     migrations: {
       tableName: 'knex_migrations',
