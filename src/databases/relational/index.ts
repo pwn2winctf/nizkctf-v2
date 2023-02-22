@@ -64,7 +64,6 @@ const teams: Database['teams'] = {
         if (countries.length > 0) {
           const countriesIdList = await transaction.select('*').from('countries').whereIn('name', countries)
           if (countriesIdList.length === 0) {
-            await transaction.rollback()
             throw new SemanticError('Invalid country')
           }
           const countriesId = new Map(countriesIdList.map(country => [country.name, country.id]))
@@ -76,7 +75,6 @@ const teams: Database['teams'] = {
           await transaction.insert({ id: members[0], teamId: id }).into('users')
         } else {
           if (user.teamId) {
-            await transaction.rollback()
             throw new SemanticError('you are already member of a team')
           } else {
             await transaction.update({ teamId: id }).where({ id: members[0] }).from('users')
