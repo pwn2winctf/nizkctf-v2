@@ -17,6 +17,7 @@
     "test": "jest --runInBand --detectOpenHandles",
     "test:watch": "jest --watch --runInBand --detectOpenHandles",
     "knex:migrate": "knex --knexfile knexfile.ts migrate:latest",
+    "knex:seed": "knex --knexfile knexfile.ts seed:run",
     "lint": "eslint . --ext .ts,.json,.js,.md",
     "lint:fix": "eslint . --ext .ts,.json,.js,.md --fix",
     "gcp-build": "tsc",
