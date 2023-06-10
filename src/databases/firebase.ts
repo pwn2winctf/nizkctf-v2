@@ -228,7 +228,7 @@ const prepareDatabase = (
         throw new (resolveFirebaseError(err))(err.message)
       }
     },
-    allWithFlag: async () => {
+    allWithProof: async () => {
       const getSolves = async () => {
         const solves: Array<{ teamId: string, moment: number, flag: string, challengeId: string }> = []
 

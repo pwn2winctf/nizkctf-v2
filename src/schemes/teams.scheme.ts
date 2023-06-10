@@ -2,7 +2,7 @@ import { check, ValidationChain } from 'express-validator'
 
 import * as constants from '../../constants.json'
 
-export const newTeamScheme:ValidationChain[] = [
+export const newTeamScheme: ValidationChain[] = [
   check('name')
     .isString()
     .custom((name: string) => name.length > 0),
@@ -15,4 +15,14 @@ export const newTeamScheme:ValidationChain[] = [
     .withMessage('country list contains an unknown country')
 ]
 
-export const newSolveScheme:ValidationChain[] = [check('challengeId').isString(), check('proof').isString().isBase64()]
+export const newSolveScheme1: ValidationChain[] = [
+  check('kPublic').isString().isHexadecimal(),
+  check('kTwoPublic').isString().isHexadecimal(),
+  check('publicKey').isString().isHexadecimal()
+]
+
+export const newSolveScheme2: ValidationChain[] = [
+  check('sessionId').isString(),
+  check('signature').isString().isHexadecimal(),
+  check('message').isString()
+]

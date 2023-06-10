@@ -14,12 +14,17 @@ export default function audit (database: Database): Router {
         return res.status(200).send(cachedData)
       }
 
-      const solves = await database.solves.allWithFlag()
+      const solves = await database.solves.allWithProof()
 
-      updateCache(5, solves, req)
+      const mappedSolves = solves.map(({ moment, ...solve }) => ({
+        ...solve,
+        time: moment
+      }))
+
+      updateCache(5, mappedSolves, req)
 
       res.setHeader('Cache-Control', 'max-age=5, s-maxage=15, stale-while-revalidate, public')
-      return res.status(200).json(solves)
+      return res.status(200).json(mappedSolves)
     } catch (err) {
       next(err)
     }

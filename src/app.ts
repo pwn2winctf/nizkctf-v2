@@ -3,6 +3,7 @@ import compression from 'compression'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import cors from 'cors'
+import { Redis } from 'ioredis'
 import * as Sentry from '@sentry/node'
 import * as Tracing from '@sentry/tracing'
 
@@ -23,6 +24,14 @@ export interface Solves {
 
 export interface Challenge {
   id: string
+  combinedPublicKey: {
+    combinedKey: string
+    hashedKey: string
+  }
+  serverKeyPair: {
+    publicKey: string
+    privateKey: string
+  }
   name: string
   pk: string
   salt: string
@@ -44,9 +53,9 @@ export interface Database {
   }
   solves: {
     all: () => Promise<{ [teamId: string]: Solves }>
-    allWithFlag: () => Promise<Array<{ teamId: string, challengeId: string, flag: string, moment: number }>>
+    allWithProof: () => Promise<Array<{ teamId: string, challengeId: string, proof: string, moment: number }>>
     get: (teamId: string) => Promise<Solves>
-    register: (teamId: string, challengeId: string, flag: string) => Promise<Solves>
+    register: (teamId: string, challengeId: string, proof: string) => Promise<Solves>
   }
   challenges: {
     all: () => Promise<{ [challengeId: string]: Challenge }>
@@ -57,10 +66,11 @@ export interface Database {
 export interface AppInterface {
   port?: number
   database: Database
+  redis: Redis
 }
 
 export default function App (args: AppInterface): Express {
-  const { port, database } = args
+  const { port, database, redis } = args
 
   const app = express()
   app.use(express.json())
@@ -83,7 +93,7 @@ export default function App (args: AppInterface): Express {
   app.use(Sentry.Handlers.requestHandler())
   app.use(Sentry.Handlers.tracingHandler())
 
-  app.use('/', routes(database))
+  app.use('/', routes(database, redis))
 
   app.listen(port, () => null)
 

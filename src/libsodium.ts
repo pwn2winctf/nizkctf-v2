@@ -27,3 +27,18 @@ export async function cryptoSignOpen (
   await libsodium.ready
   return await libsodium.crypto_sign_open(signedMessage, publicKey)
 }
+
+export async function cryptoPwHash (password: string, salt: Uint8Array, opslimit: number, memlimit: number): Promise<Uint8Array> {
+  await libsodium.ready
+
+  const data = await libsodium.crypto_pwhash(
+    libsodium.crypto_sign_SEEDBYTES,
+    password,
+    salt,
+    opslimit,
+    memlimit,
+    libsodium.crypto_pwhash_ALG_ARGON2ID13
+  )
+
+  return data
+}

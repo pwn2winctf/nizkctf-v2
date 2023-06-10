@@ -29,6 +29,10 @@ declare module 'knex/types/tables' {
   }
   interface Challenge {
     id: string,
+    combinedKey: string,
+    hashedKey: string,
+    serverPublicKey: string,
+    serverPrivateKey: string,
     name: string,
     pk: string,
     salt: string,
@@ -39,7 +43,7 @@ declare module 'knex/types/tables' {
     challengeId: Challenge['id'],
     teamId: Team['id'],
     moment: Date,
-    flag: string
+    proof: string
   }
 
   interface Tables {
@@ -193,8 +197,15 @@ const challenges: Database['challenges'] = {
   all: async () => {
     const challenges = await db.select('*').from('challenges')
 
-    return challenges.reduce((obj: { [challengeId: string]: Challenge }, challenge) => {
-      obj[challenge.id] = challenge
+    return challenges.reduce((obj: { [challengeId: string]: Challenge }, { combinedKey, hashedKey, ...challenge }) => {
+      obj[challenge.id] = {
+        combinedPublicKey: { combinedKey, hashedKey },
+        serverKeyPair: {
+          publicKey: challenge.serverPublicKey,
+          privateKey: challenge.serverPrivateKey
+        },
+        ...challenge
+      }
       return obj
     }, {})
   },
@@ -205,7 +216,18 @@ const challenges: Database['challenges'] = {
       throw new NotFoundError('Challenge not found')
     }
 
-    return challenge
+    const { hashedKey, combinedKey, ...others } = challenge
+
+    return {
+      ...others,
+      combinedPublicKey: {
+        hashedKey, combinedKey
+      },
+      serverKeyPair: {
+        publicKey: challenge.serverPublicKey,
+        privateKey: challenge.serverPrivateKey
+      }
+    }
   }
 }
 
@@ -223,10 +245,10 @@ const solves: Database['solves'] = {
       return obj
     }, {})
   },
-  register: async (teamId, challengeId, flag) => {
+  register: async (teamId, challengeId, proof) => {
     try {
       const timestamp = new Date()
-      await db.insert({ teamId, challengeId, moment: timestamp, flag }).into('solves')
+      await db.insert({ teamId, challengeId, moment: timestamp, proof }).into('solves')
       return { challengeId: timestamp.getTime() }
     } catch (err) {
       if (err instanceof Error) {
@@ -247,7 +269,7 @@ const solves: Database['solves'] = {
       return obj
     }, {})
   },
-  allWithFlag: async () => {
+  allWithProof: async () => {
     const solves = await db.select('*').from('solves')
     return solves.map(solve => ({ ...solve, moment: solve.moment.getTime() }))
   }
